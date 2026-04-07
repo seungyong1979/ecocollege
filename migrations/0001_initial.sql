@@ -41,7 +41,7 @@ INSERT OR IGNORE INTO site_settings (key, value) VALUES
 
 -- 기본 관리자 계정 (비밀번호: admin1234 → SHA256 해시)
 INSERT OR IGNORE INTO admins (username, password_hash) VALUES
-  ('admin', '3d0941d7eb1f4e8f9432c0d52e700ca4a2c5e2f7b97e3491c8234c89a15f4d3b');
+  ('admin', 'ac9689e2272427085e35b9d3e3e8bed88cb3434828b43b86fc0596cad4c6e270');
 
 CREATE INDEX IF NOT EXISTS idx_agendas_status ON agendas(status);
 CREATE INDEX IF NOT EXISTS idx_agendas_created_at ON agendas(created_at);
