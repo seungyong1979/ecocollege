@@ -1,6 +1,9 @@
 # prod
 dist/
 
+# local DB data (render.com uses /var/data)
+data/
+
 # dev
 .yarn/
 !.yarn/releases

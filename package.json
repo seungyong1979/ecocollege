@@ -1,24 +1,22 @@
 {
   "name": "sunchon-eco-agenda",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "wrangler pages dev dist",
-    "deploy": "npm run build && wrangler pages deploy dist --project-name sunchon-eco-agenda",
-    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
-    "db:migrate:local": "wrangler d1 migrations apply sunchon-eco-production --local",
-    "db:seed": "wrangler d1 execute sunchon-eco-production --local --file=./seed.sql",
-    "db:reset": "rm -rf .wrangler/state/v3/d1 && npm run db:migrate:local",
-    "dev:sandbox": "wrangler pages dev dist --d1=sunchon-eco-production --local --ip 0.0.0.0 --port 3000"
+    "start": "node --import tsx/esm src/server.ts",
+    "dev": "tsx watch src/server.ts",
+    "build": "echo 'No build step required for Node.js server'"
   },
   "dependencies": {
+    "@hono/node-server": "^1.14.4",
+    "better-sqlite3": "^11.9.1",
     "hono": "^4.12.11"
   },
   "devDependencies": {
-    "@hono/vite-build": "^1.2.0",
-    "@hono/vite-dev-server": "^0.18.2",
-    "vite": "^6.3.5",
-    "wrangler": "^4.4.0"
+    "@types/better-sqlite3": "^7.6.12",
+    "tsx": "^4.19.4"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   }
 }

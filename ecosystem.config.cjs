@@ -2,11 +2,13 @@ module.exports = {
   apps: [
     {
       name: 'eco-agenda',
-      script: 'npx',
-      args: 'wrangler pages dev dist --d1=sunchon-eco-production --local --ip 0.0.0.0 --port 3000',
+      script: 'node',
+      args: '--import tsx/esm src/server.ts',
+      cwd: '/home/user/webapp',
       env: {
         NODE_ENV: 'development',
-        PORT: 3000
+        PORT: 3000,
+        DB_DIR: '/home/user/webapp/data'
       },
       watch: false,
       instances: 1,

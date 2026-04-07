@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: sunchon-eco-agenda
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: ADMIN_SECRET
+        generateValue: true
+      - key: DB_DIR
+        value: /var/data
+    disk:
+      name: eco-data
+      mountPath: /var/data
+      sizeGB: 1
