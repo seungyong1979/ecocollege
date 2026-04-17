@@ -292,17 +292,23 @@ export async function mainPage(c: Context) {
       <div>
         <label class="block text-sm font-semibold text-gray-700 mb-1">거주 동 <span class="text-red-500">*</span></label>
         <select id="input-district" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm transition-all bg-white">
-          <option value="">거주하시는 동을 선택해 주세요</option>
-          <option>매곡동</option><option>조례동</option><option>풍덕동</option>
-          <option>연향동</option><option>왕지동</option><option>덕연동</option>
-          <option>오천동</option><option>가곡동</option><option>생목동</option>
-          <option>남제동</option><option>장천동</option><option>용당동</option>
-          <option>저전동</option><option>향동</option><option>행동</option>
-          <option>교량동</option><option>와룡동</option><option>금곡동</option>
-          <option>인제동</option><option>도사동</option><option>해룡면</option>
-          <option>서면</option><option>황전면</option><option>월등면</option>
-          <option>주암면</option><option>승주읍</option><option>외서면</option>
-          <option>낙안면</option><option>별량면</option><option>상사면</option>
+          <option value="">거주하시는 읍·면·동을 선택해 주세요</option>
+          <optgroup label="읍">
+            <option>승주읍</option>
+          </optgroup>
+          <optgroup label="면">
+            <option>주암면</option><option>송광면</option><option>외서면</option>
+            <option>낙안면</option><option>별량면</option><option>상사면</option>
+            <option>해룡면</option><option>서면</option><option>황전면</option>
+            <option>월등면</option>
+          </optgroup>
+          <optgroup label="동">
+            <option>향동</option><option>매곡동</option><option>중앙동</option>
+            <option>풍덕동</option><option>남제동</option><option>저전동</option>
+            <option>장천동</option><option>덕연동</option><option>조곡동</option>
+            <option>왕조1동</option><option>왕조2동</option><option>도사동</option>
+            <option>생목동</option>
+          </optgroup>
           <option>기타</option>
         </select>
       </div>
