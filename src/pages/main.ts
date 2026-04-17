@@ -61,9 +61,278 @@ export async function mainPage(c: Context) {
     #carousel-track { display:flex; gap:16px; transition:transform 0.7s ease-in-out; }
     .agenda-card { min-width:280px; max-width:320px; flex-shrink:0; }
     @media(max-width:640px){ .agenda-card{min-width:calc(100vw - 64px);max-width:calc(100vw - 64px);} }
+
+    /* ── 사이드 메뉴 ── */
+    #side-menu {
+      position: fixed;
+      top: 0; right: -320px;
+      width: 300px;
+      height: 100vh;
+      background: #0f2d1a;
+      z-index: 1000;
+      transition: right 0.4s cubic-bezier(0.4,0,0.2,1);
+      display: flex;
+      flex-direction: column;
+      box-shadow: -8px 0 40px rgba(0,0,0,0.4);
+    }
+    #side-menu.open { right: 0; }
+    #menu-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(3px);
+      z-index: 999;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s;
+    }
+    #menu-overlay.open { opacity: 1; pointer-events: auto; }
+    #menu-toggle {
+      position: fixed;
+      top: 20px; right: 20px;
+      z-index: 1001;
+      width: 48px; height: 48px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 14px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 5px; cursor: pointer;
+      transition: all 0.3s;
+    }
+    #menu-toggle:hover { background: rgba(255,255,255,0.25); transform: scale(1.05); }
+    #menu-toggle.menu-open { background: rgba(22,163,74,0.8); border-color: rgba(22,163,74,0.6); }
+    .hamburger-line {
+      width: 22px; height: 2px;
+      background: white; border-radius: 2px;
+      transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+      transform-origin: center;
+    }
+    #menu-toggle.menu-open .line1 { transform: translateY(7px) rotate(45deg); }
+    #menu-toggle.menu-open .line2 { opacity: 0; transform: scaleX(0); }
+    #menu-toggle.menu-open .line3 { transform: translateY(-7px) rotate(-45deg); }
+    .side-nav-item {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+    .side-nav-item::before {
+      content: '';
+      position: absolute; left: 0; top: 0;
+      width: 0; height: 100%;
+      background: linear-gradient(90deg, rgba(22,163,74,0.3), transparent);
+      transition: width 0.3s;
+    }
+    .side-nav-item:hover::before { width: 100%; }
+    .side-nav-item:hover { border-left-color: #22c55e !important; }
+    .side-panel {
+      display: none;
+      animation: panelIn 0.35s ease-out;
+    }
+    .side-panel.active { display: block; }
+    @keyframes panelIn { from{opacity:0;transform:translateX(15px)} to{opacity:1;transform:translateX(0)} }
+    .panel-tag {
+      display: inline-block;
+      background: rgba(34,197,94,0.15);
+      color: #4ade80;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+    }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
+
+<!-- ══════════════ 사이드 메뉴 토글 버튼 ══════════════ -->
+<button id="menu-toggle" onclick="toggleMenu()" aria-label="메뉴 열기">
+  <div class="hamburger-line line1"></div>
+  <div class="hamburger-line line2"></div>
+  <div class="hamburger-line line3"></div>
+</button>
+
+<!-- 배경 오버레이 -->
+<div id="menu-overlay" onclick="closeMenu()"></div>
+
+<!-- ══════════════ 사이드 메뉴 패널 ══════════════ -->
+<nav id="side-menu" role="navigation" aria-label="사이트 메뉴">
+
+  <!-- 메뉴 헤더 -->
+  <div class="px-7 pt-8 pb-6 border-b border-green-900">
+    <div class="flex items-center gap-3 mb-1">
+      <div class="w-9 h-9 bg-green-700 rounded-xl flex items-center justify-center">
+        <i class="fas fa-leaf text-green-200 text-sm"></i>
+      </div>
+      <div>
+        <p class="text-white font-black text-base leading-tight">순천에코칼리지</p>
+        <p class="text-green-400 text-xs">Sunchon Eco College</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 메뉴 항목 -->
+  <div class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+
+    <!-- ABOUT -->
+    <div class="side-nav-item border-l-4 border-transparent rounded-r-xl px-4 py-1 cursor-pointer"
+         onclick="showPanel('about')" id="nav-about">
+      <div class="flex items-center justify-between py-3">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-green-900 flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-seedling text-green-400 text-xs"></i>
+          </div>
+          <div>
+            <p class="text-white font-black text-sm tracking-widest">ABOUT</p>
+            <p class="text-green-500 text-xs mt-0.5">단체 소개</p>
+          </div>
+        </div>
+        <i class="fas fa-chevron-right text-green-600 text-xs transition-transform" id="arrow-about"></i>
+      </div>
+      <!-- ABOUT 패널 -->
+      <div class="side-panel" id="panel-about">
+        <div class="bg-green-950 bg-opacity-60 rounded-xl p-4 mb-3 border border-green-900">
+          <div class="panel-tag">ABOUT US</div>
+          <h3 class="text-white font-bold text-sm mb-2">순천에코칼리지란?</h3>
+          <p class="text-green-200 text-xs leading-relaxed">
+            순천에코칼리지는 생태문명 전환을 위한 시민교육과 공론장을 운영하는 단체입니다. 인간과 자연이 공존하는 지속가능한 도시 순천을 만들기 위해 다양한 활동을 펼치고 있습니다.
+          </p>
+          <div class="mt-3 pt-3 border-t border-green-900 space-y-2">
+            <div class="flex items-center gap-2 text-xs text-green-300">
+              <i class="fas fa-map-marker-alt text-green-500 w-3"></i>
+              <span>전남 순천시</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs text-green-300">
+              <i class="fas fa-calendar text-green-500 w-3"></i>
+              <span>2024년 생태적 공론장 운영 중</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex gap-2 pb-3">
+          <a href="${s.footer_blog}" target="_blank"
+            class="flex-1 flex items-center justify-center gap-1.5 bg-green-900 hover:bg-green-800 text-green-300 text-xs font-semibold py-2 rounded-lg transition-all">
+            <i class="fas fa-blog text-xs"></i> 블로그
+          </a>
+          <a href="${s.footer_instagram}" target="_blank"
+            class="flex-1 flex items-center justify-center gap-1.5 bg-green-900 hover:bg-green-800 text-green-300 text-xs font-semibold py-2 rounded-lg transition-all">
+            <i class="fab fa-instagram text-xs"></i> 인스타
+          </a>
+          <a href="${s.footer_facebook}" target="_blank"
+            class="flex-1 flex items-center justify-center gap-1.5 bg-green-900 hover:bg-green-800 text-green-300 text-xs font-semibold py-2 rounded-lg transition-all">
+            <i class="fab fa-facebook text-xs"></i> 페북
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 구분선 -->
+    <div class="border-t border-green-900 mx-2"></div>
+
+    <!-- PROGRAM -->
+    <div class="side-nav-item border-l-4 border-transparent rounded-r-xl px-4 py-1 cursor-pointer"
+         onclick="showPanel('program')" id="nav-program">
+      <div class="flex items-center justify-between py-3">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-green-900 flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-calendar-alt text-green-400 text-xs"></i>
+          </div>
+          <div>
+            <p class="text-white font-black text-sm tracking-widest">PROGRAM</p>
+            <p class="text-green-500 text-xs mt-0.5">운영 프로그램</p>
+          </div>
+        </div>
+        <i class="fas fa-chevron-right text-green-600 text-xs transition-transform" id="arrow-program"></i>
+      </div>
+      <!-- PROGRAM 패널 -->
+      <div class="side-panel" id="panel-program">
+        <div class="space-y-2 mb-3">
+          <div class="bg-green-950 bg-opacity-60 rounded-xl p-3 border border-green-900">
+            <div class="flex items-start gap-2">
+              <div class="w-6 h-6 bg-green-800 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                <i class="fas fa-comments text-green-300 text-xs"></i>
+              </div>
+              <div>
+                <p class="text-white text-xs font-bold">생태적 공론장</p>
+                <p class="text-green-400 text-xs mt-0.5 leading-relaxed">시민이 직접 제안하고 토론하는 생태 의제 공론화 프로그램</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-green-950 bg-opacity-60 rounded-xl p-3 border border-green-900">
+            <div class="flex items-start gap-2">
+              <div class="w-6 h-6 bg-green-800 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                <i class="fas fa-graduation-cap text-green-300 text-xs"></i>
+              </div>
+              <div>
+                <p class="text-white text-xs font-bold">생태시민 교육</p>
+                <p class="text-green-400 text-xs mt-0.5 leading-relaxed">생태문명 전환을 위한 시민 강좌 및 워크숍</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-green-950 bg-opacity-60 rounded-xl p-3 border border-green-900">
+            <div class="flex items-start gap-2">
+              <div class="w-6 h-6 bg-green-800 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                <i class="fas fa-map text-green-300 text-xs"></i>
+              </div>
+              <div>
+                <p class="text-white text-xs font-bold">생태 현장 탐방</p>
+                <p class="text-green-400 text-xs mt-0.5 leading-relaxed">순천만·동천 등 지역 생태 현장 답사 프로그램</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 구분선 -->
+    <div class="border-t border-green-900 mx-2"></div>
+
+    <!-- APPLY -->
+    <div class="side-nav-item border-l-4 border-transparent rounded-r-xl px-4 py-1 cursor-pointer"
+         onclick="showPanel('apply')" id="nav-apply">
+      <div class="flex items-center justify-between py-3">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-green-900 flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-paper-plane text-green-400 text-xs"></i>
+          </div>
+          <div>
+            <p class="text-white font-black text-sm tracking-widest">APPLY</p>
+            <p class="text-green-500 text-xs mt-0.5">참여 신청</p>
+          </div>
+        </div>
+        <i class="fas fa-chevron-right text-green-600 text-xs transition-transform" id="arrow-apply"></i>
+      </div>
+      <!-- APPLY 패널 -->
+      <div class="side-panel" id="panel-apply">
+        <div class="bg-green-950 bg-opacity-60 rounded-xl p-4 mb-3 border border-green-900">
+          <div class="panel-tag">PARTICIPATION</div>
+          <p class="text-green-200 text-xs leading-relaxed mb-3">
+            순천에코칼리지의 활동에 참여하고 싶으신가요? 의제 창구를 통해 의견을 남기거나, 직접 연락해 주세요.
+          </p>
+          <button
+            onclick="closeMenu(); setTimeout(()=>{ document.getElementById('main-agenda-input').scrollIntoView({behavior:'smooth'}); setTimeout(()=>document.getElementById('main-agenda-input').focus(),600) },300)"
+            class="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-500 text-white text-xs font-bold py-2.5 rounded-xl transition-all mb-2">
+            <i class="fas fa-leaf"></i> 의제 등록하러 가기
+          </button>
+          <div class="space-y-2 pt-2 border-t border-green-900">
+            ${s.footer_phone ? `<a href="tel:${s.footer_phone}" class="flex items-center gap-2 text-green-300 hover:text-green-200 text-xs transition-colors">
+              <i class="fas fa-phone text-green-500 w-3"></i>${s.footer_phone}
+            </a>` : ''}
+            ${s.footer_email ? `<a href="mailto:${s.footer_email}" class="flex items-center gap-2 text-green-300 hover:text-green-200 text-xs transition-colors">
+              <i class="fas fa-envelope text-green-500 w-3"></i>${s.footer_email}
+            </a>` : ''}
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 메뉴 푸터 -->
+  <div class="px-6 py-4 border-t border-green-900">
+    <p class="text-green-700 text-xs text-center">© 2024 순천에코칼리지</p>
+  </div>
+
+</nav>
 
 <!-- HERO -->
 <section class="relative min-h-screen flex items-center justify-center overflow-hidden"
@@ -355,6 +624,71 @@ let allAgendas = []
 let carouselInterval = null
 let carouselOffset = 0
 
+// ==================== 사이드 메뉴 ====================
+let currentPanel = null
+
+function toggleMenu() {
+  const menu = document.getElementById('side-menu')
+  const overlay = document.getElementById('menu-overlay')
+  const toggle = document.getElementById('menu-toggle')
+  const isOpen = menu.classList.contains('open')
+  if (isOpen) {
+    closeMenu()
+  } else {
+    menu.classList.add('open')
+    overlay.classList.add('open')
+    toggle.classList.add('menu-open')
+    document.body.style.overflow = 'hidden'
+  }
+}
+
+function closeMenu() {
+  document.getElementById('side-menu').classList.remove('open')
+  document.getElementById('menu-overlay').classList.remove('open')
+  document.getElementById('menu-toggle').classList.remove('menu-open')
+  document.body.style.overflow = ''
+}
+
+function showPanel(name) {
+  const panels = ['about', 'program', 'apply']
+  panels.forEach(p => {
+    const panel = document.getElementById('panel-' + p)
+    const nav = document.getElementById('nav-' + p)
+    const arrow = document.getElementById('arrow-' + p)
+    if (p === name) {
+      if (currentPanel === name) {
+        // 같은 메뉴 다시 클릭 → 닫기
+        panel.classList.remove('active')
+        nav.style.borderLeftColor = 'transparent'
+        arrow.style.transform = 'rotate(0deg)'
+        currentPanel = null
+      } else {
+        panel.classList.add('active')
+        nav.style.borderLeftColor = '#22c55e'
+        arrow.style.transform = 'rotate(90deg)'
+        currentPanel = name
+      }
+    } else {
+      panel.classList.remove('active')
+      nav.style.borderLeftColor = 'transparent'
+      arrow.style.transform = 'rotate(0deg)'
+    }
+  })
+}
+
+// ESC 키로 메뉴 닫기
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (document.getElementById('side-menu').classList.contains('open')) {
+      closeMenu(); return
+    }
+    ;['submit-modal','success-modal'].forEach(id => {
+      if (!document.getElementById(id).classList.contains('hidden')) closeModal(id)
+    })
+  }
+})
+
+// ==================== 초기화 ====================
 document.addEventListener('DOMContentLoaded', async () => {
   await Promise.all([loadAgendas(), loadWordCloud()])
   const ta = document.getElementById('main-agenda-input')
@@ -518,11 +852,6 @@ function esc(text) {
   return d.innerHTML
 }
 
-document.addEventListener('keydown', e => {
-  if (e.key==='Escape') ['submit-modal','success-modal'].forEach(id => {
-    if (!document.getElementById(id).classList.contains('hidden')) closeModal(id)
-  })
-})
 </script>
 </body>
 </html>`
