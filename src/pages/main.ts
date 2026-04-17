@@ -141,6 +141,28 @@ export async function mainPage(c: Context) {
       border-radius: 20px;
       margin-bottom: 12px;
     }
+    /* 하위 메뉴 스타일 */
+    .sub-menu-item {
+      padding: 8px 10px;
+      margin-bottom: 2px;
+      background: rgba(20,83,45,0.5);
+      border: 1px solid rgba(34,197,94,0.15);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .sub-menu-item:hover { background: rgba(22,101,52,0.7); }
+    .sub-panel {
+      display: none;
+      padding: 10px 12px 12px;
+      margin-bottom: 6px;
+      background: rgba(5,46,22,0.6);
+      border-left: 2px solid rgba(34,197,94,0.4);
+      border-radius: 0 8px 8px 8px;
+      animation: panelIn 0.25s ease-out;
+    }
+    .sub-panel.active { display: block; }
+    .sub-arrow-rotate { transform: rotate(180deg); }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -191,13 +213,21 @@ export async function mainPage(c: Context) {
       </div>
       <!-- ABOUT 패널 -->
       <div class="side-panel" id="panel-about">
-        <div class="bg-green-950 bg-opacity-60 rounded-xl p-4 mb-3 border border-green-900">
-          <div class="panel-tag">ABOUT US</div>
-          <h3 class="text-white font-bold text-sm mb-2">순천에코칼리지란?</h3>
-          <p class="text-green-200 text-xs leading-relaxed">
+        <!-- 에코칼리지란? -->
+        <div class="sub-menu-item" onclick="toggleSub('about-1',event)">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-leaf text-green-400 text-xs w-4"></i>
+              <span class="text-white text-xs font-semibold">에코칼리지란?</span>
+            </div>
+            <i class="fas fa-chevron-down text-green-600 text-xs transition-transform" id="sub-arrow-about-1"></i>
+          </div>
+        </div>
+        <div class="sub-panel" id="sub-panel-about-1">
+          <p class="text-green-200 text-xs leading-relaxed mb-2">
             순천에코칼리지는 생태문명 전환을 위한 시민교육과 공론장을 운영하는 단체입니다. 인간과 자연이 공존하는 지속가능한 도시 순천을 만들기 위해 다양한 활동을 펼치고 있습니다.
           </p>
-          <div class="mt-3 pt-3 border-t border-green-900 space-y-2">
+          <div class="space-y-1">
             <div class="flex items-center gap-2 text-xs text-green-300">
               <i class="fas fa-map-marker-alt text-green-500 w-3"></i>
               <span>전남 순천시</span>
@@ -208,19 +238,49 @@ export async function mainPage(c: Context) {
             </div>
           </div>
         </div>
-        <div class="flex gap-2 pb-3">
-          <a href="${s.footer_blog}" target="_blank"
-            class="flex-1 flex items-center justify-center gap-1.5 bg-green-900 hover:bg-green-800 text-green-300 text-xs font-semibold py-2 rounded-lg transition-all">
-            <i class="fas fa-blog text-xs"></i> 블로그
-          </a>
-          <a href="${s.footer_instagram}" target="_blank"
-            class="flex-1 flex items-center justify-center gap-1.5 bg-green-900 hover:bg-green-800 text-green-300 text-xs font-semibold py-2 rounded-lg transition-all">
-            <i class="fab fa-instagram text-xs"></i> 인스타
-          </a>
-          <a href="${s.footer_facebook}" target="_blank"
-            class="flex-1 flex items-center justify-center gap-1.5 bg-green-900 hover:bg-green-800 text-green-300 text-xs font-semibold py-2 rounded-lg transition-all">
-            <i class="fab fa-facebook text-xs"></i> 페북
-          </a>
+        <!-- 교육 철학 -->
+        <div class="sub-menu-item" onclick="toggleSub('about-2',event)">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-book-open text-green-400 text-xs w-4"></i>
+              <span class="text-white text-xs font-semibold">교육 철학</span>
+            </div>
+            <i class="fas fa-chevron-down text-green-600 text-xs transition-transform" id="sub-arrow-about-2"></i>
+          </div>
+        </div>
+        <div class="sub-panel" id="sub-panel-about-2">
+          <p class="text-green-200 text-xs leading-relaxed">
+            생태문명으로의 전환은 단순한 환경 보호를 넘어, 인간과 자연의 관계를 새롭게 정립하는 것입니다. 우리는 시민 한 사람 한 사람이 생태적 감수성과 실천력을 갖출 수 있도록 교육합니다.
+          </p>
+        </div>
+        <!-- 운영 주체 -->
+        <div class="sub-menu-item" onclick="toggleSub('about-3',event)">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-users text-green-400 text-xs w-4"></i>
+              <span class="text-white text-xs font-semibold">운영 주체</span>
+            </div>
+            <i class="fas fa-chevron-down text-green-600 text-xs transition-transform" id="sub-arrow-about-3"></i>
+          </div>
+        </div>
+        <div class="sub-panel" id="sub-panel-about-3">
+          <p class="text-green-200 text-xs leading-relaxed mb-2">
+            순천에코칼리지는 지역 시민사회·교육·연구 기관이 함께 참여하는 거버넌스 구조로 운영됩니다.
+          </p>
+          <div class="flex gap-2 pt-1">
+            <a href="${s.footer_blog}" target="_blank"
+              class="flex-1 flex items-center justify-center gap-1 bg-green-900 hover:bg-green-800 text-green-300 text-xs font-semibold py-2 rounded-lg transition-all">
+              <i class="fas fa-blog text-xs"></i> 블로그
+            </a>
+            <a href="${s.footer_instagram}" target="_blank"
+              class="flex-1 flex items-center justify-center gap-1 bg-green-900 hover:bg-green-800 text-green-300 text-xs font-semibold py-2 rounded-lg transition-all">
+              <i class="fab fa-instagram text-xs"></i> 인스타
+            </a>
+            <a href="${s.footer_facebook}" target="_blank"
+              class="flex-1 flex items-center justify-center gap-1 bg-green-900 hover:bg-green-800 text-green-300 text-xs font-semibold py-2 rounded-lg transition-all">
+              <i class="fab fa-facebook text-xs"></i> 페북
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -245,40 +305,55 @@ export async function mainPage(c: Context) {
       </div>
       <!-- PROGRAM 패널 -->
       <div class="side-panel" id="panel-program">
-        <div class="space-y-2 mb-3">
-          <div class="bg-green-950 bg-opacity-60 rounded-xl p-3 border border-green-900">
-            <div class="flex items-start gap-2">
-              <div class="w-6 h-6 bg-green-800 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                <i class="fas fa-comments text-green-300 text-xs"></i>
-              </div>
-              <div>
-                <p class="text-white text-xs font-bold">생태적 공론장</p>
-                <p class="text-green-400 text-xs mt-0.5 leading-relaxed">시민이 직접 제안하고 토론하는 생태 의제 공론화 프로그램</p>
-              </div>
+        <!-- 2025 시범과정 -->
+        <div class="sub-menu-item" onclick="toggleSub('prog-1',event)">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-seedling text-green-400 text-xs w-4"></i>
+              <span class="text-white text-xs font-semibold">2025 시범과정</span>
             </div>
+            <i class="fas fa-chevron-down text-green-600 text-xs transition-transform" id="sub-arrow-prog-1"></i>
           </div>
-          <div class="bg-green-950 bg-opacity-60 rounded-xl p-3 border border-green-900">
-            <div class="flex items-start gap-2">
-              <div class="w-6 h-6 bg-green-800 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                <i class="fas fa-graduation-cap text-green-300 text-xs"></i>
-              </div>
-              <div>
-                <p class="text-white text-xs font-bold">생태시민 교육</p>
-                <p class="text-green-400 text-xs mt-0.5 leading-relaxed">생태문명 전환을 위한 시민 강좌 및 워크숍</p>
-              </div>
+        </div>
+        <div class="sub-panel" id="sub-panel-prog-1">
+          <p class="text-green-200 text-xs leading-relaxed">
+            2025년도 시범 운영 과정으로, 생태시민 기초 교육과 현장 탐방을 결합한 입문 프로그램입니다. 순천 지역 생태 현장을 직접 체험하고 공론화 방법을 익힙니다.
+          </p>
+        </div>
+        <!-- 2026 생태문명 전환 촉진자 양성 과정 -->
+        <div class="sub-menu-item" onclick="toggleSub('prog-2',event)">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-graduation-cap text-green-400 text-xs w-4"></i>
+              <span class="text-white text-xs font-semibold leading-tight">2026 생태문명 전환<br class="block">촉진자 양성 과정</span>
             </div>
+            <i class="fas fa-chevron-down text-green-600 text-xs transition-transform flex-shrink-0 ml-2" id="sub-arrow-prog-2"></i>
           </div>
-          <div class="bg-green-950 bg-opacity-60 rounded-xl p-3 border border-green-900">
-            <div class="flex items-start gap-2">
-              <div class="w-6 h-6 bg-green-800 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                <i class="fas fa-map text-green-300 text-xs"></i>
-              </div>
-              <div>
-                <p class="text-white text-xs font-bold">생태 현장 탐방</p>
-                <p class="text-green-400 text-xs mt-0.5 leading-relaxed">순천만·동천 등 지역 생태 현장 답사 프로그램</p>
-              </div>
+        </div>
+        <div class="sub-panel" id="sub-panel-prog-2">
+          <p class="text-green-200 text-xs leading-relaxed">
+            생태문명 전환을 이끌어 갈 지역 촉진자를 양성하는 심화 과정입니다. 이론과 실천을 통합한 커리큘럼으로 지역사회 변화를 주도할 역량을 키웁니다.
+          </p>
+        </div>
+        <!-- 생태공론장 -->
+        <div class="sub-menu-item" onclick="toggleSub('prog-3',event)">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-comments text-green-400 text-xs w-4"></i>
+              <span class="text-white text-xs font-semibold">생태공론장</span>
             </div>
+            <i class="fas fa-chevron-down text-green-600 text-xs transition-transform" id="sub-arrow-prog-3"></i>
           </div>
+        </div>
+        <div class="sub-panel" id="sub-panel-prog-3">
+          <p class="text-green-200 text-xs leading-relaxed">
+            시민이 직접 생태 의제를 발굴하고 토론하는 공론화 프로그램입니다. 이 페이지의 의제 등록 창구를 통해 시민 누구나 의제를 제안할 수 있습니다.
+          </p>
+          <button
+            onclick="closeMenu(); setTimeout(()=>{ document.getElementById('main-agenda-input').scrollIntoView({behavior:'smooth'}); setTimeout(()=>document.getElementById('main-agenda-input').focus(),600) },300)"
+            class="mt-2 w-full flex items-center justify-center gap-2 bg-green-700 hover:bg-green-600 text-white text-xs font-bold py-2 rounded-xl transition-all">
+            <i class="fas fa-leaf"></i> 의제 등록하러 가기
+          </button>
         </div>
       </div>
     </div>
@@ -303,23 +378,63 @@ export async function mainPage(c: Context) {
       </div>
       <!-- APPLY 패널 -->
       <div class="side-panel" id="panel-apply">
-        <div class="bg-green-950 bg-opacity-60 rounded-xl p-4 mb-3 border border-green-900">
-          <div class="panel-tag">PARTICIPATION</div>
-          <p class="text-green-200 text-xs leading-relaxed mb-3">
-            순천에코칼리지의 활동에 참여하고 싶으신가요? 의제 창구를 통해 의견을 남기거나, 직접 연락해 주세요.
+        <!-- 참여 안내 -->
+        <div class="sub-menu-item" onclick="toggleSub('apply-1',event)">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-info-circle text-green-400 text-xs w-4"></i>
+              <span class="text-white text-xs font-semibold">참여 안내</span>
+            </div>
+            <i class="fas fa-chevron-down text-green-600 text-xs transition-transform" id="sub-arrow-apply-1"></i>
+          </div>
+        </div>
+        <div class="sub-panel" id="sub-panel-apply-1">
+          <p class="text-green-200 text-xs leading-relaxed">
+            순천에코칼리지의 프로그램에 참여하시려면 공지되는 모집 일정에 따라 신청하시면 됩니다. 생태 의제 창구는 연중 상시 운영됩니다.
+          </p>
+        </div>
+        <!-- 의제 등록 -->
+        <div class="sub-menu-item" onclick="toggleSub('apply-2',event)">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-pencil-alt text-green-400 text-xs w-4"></i>
+              <span class="text-white text-xs font-semibold">의제 등록</span>
+            </div>
+            <i class="fas fa-chevron-down text-green-600 text-xs transition-transform" id="sub-arrow-apply-2"></i>
+          </div>
+        </div>
+        <div class="sub-panel" id="sub-panel-apply-2">
+          <p class="text-green-200 text-xs leading-relaxed mb-2">
+            순천에서 다뤄야 할 생태·환경 의제를 자유롭게 제안해 주세요. 제안하신 의제는 공론장 운영에 반영됩니다.
           </p>
           <button
             onclick="closeMenu(); setTimeout(()=>{ document.getElementById('main-agenda-input').scrollIntoView({behavior:'smooth'}); setTimeout(()=>document.getElementById('main-agenda-input').focus(),600) },300)"
-            class="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-500 text-white text-xs font-bold py-2.5 rounded-xl transition-all mb-2">
+            class="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-500 text-white text-xs font-bold py-2.5 rounded-xl transition-all">
             <i class="fas fa-leaf"></i> 의제 등록하러 가기
           </button>
-          <div class="space-y-2 pt-2 border-t border-green-900">
+        </div>
+        <!-- 문의하기 -->
+        <div class="sub-menu-item" onclick="toggleSub('apply-3',event)">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-envelope text-green-400 text-xs w-4"></i>
+              <span class="text-white text-xs font-semibold">문의하기</span>
+            </div>
+            <i class="fas fa-chevron-down text-green-600 text-xs transition-transform" id="sub-arrow-apply-3"></i>
+          </div>
+        </div>
+        <div class="sub-panel" id="sub-panel-apply-3">
+          <div class="space-y-2">
             ${s.footer_phone ? `<a href="tel:${s.footer_phone}" class="flex items-center gap-2 text-green-300 hover:text-green-200 text-xs transition-colors">
-              <i class="fas fa-phone text-green-500 w-3"></i>${s.footer_phone}
+              <i class="fas fa-phone text-green-500 w-4"></i>${s.footer_phone}
             </a>` : ''}
             ${s.footer_email ? `<a href="mailto:${s.footer_email}" class="flex items-center gap-2 text-green-300 hover:text-green-200 text-xs transition-colors">
-              <i class="fas fa-envelope text-green-500 w-3"></i>${s.footer_email}
+              <i class="fas fa-envelope text-green-500 w-4"></i>${s.footer_email}
             </a>` : ''}
+            <a href="${s.footer_blog}" target="_blank"
+              class="flex items-center gap-2 text-green-300 hover:text-green-200 text-xs transition-colors">
+              <i class="fas fa-blog text-green-500 w-4"></i>공식 블로그
+            </a>
           </div>
         </div>
       </div>
@@ -674,6 +789,16 @@ function showPanel(name) {
       arrow.style.transform = 'rotate(0deg)'
     }
   })
+}
+
+function toggleSub(id, event) {
+  event.stopPropagation()
+  const panel = document.getElementById('sub-panel-' + id)
+  const arrow = document.getElementById('sub-arrow-' + id)
+  if (!panel) return
+  const isOpen = panel.classList.contains('active')
+  panel.classList.toggle('active', !isOpen)
+  if (arrow) arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)'
 }
 
 // ESC 키로 메뉴 닫기
