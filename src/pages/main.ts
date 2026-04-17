@@ -224,19 +224,24 @@ export async function mainPage(c: Context) {
           </div>
         </div>
         <div class="sub-panel" id="sub-panel-about-1">
-          <p class="text-green-200 text-xs leading-relaxed mb-2">
-            순천에코칼리지는 생태문명 전환을 위한 시민교육과 공론장을 운영하는 단체입니다. 인간과 자연이 공존하는 지속가능한 도시 순천을 만들기 위해 다양한 활동을 펼치고 있습니다.
+          <p class="text-green-300 text-sm font-semibold italic leading-relaxed mb-3">
+            "또 다른 삶의 가능성은 없을까?"
           </p>
-          <div class="space-y-1">
-            <div class="flex items-center gap-2 text-xs text-green-300">
-              <i class="fas fa-map-marker-alt text-green-500 w-3"></i>
-              <span>전남 순천시</span>
-            </div>
-            <div class="flex items-center gap-2 text-xs text-green-300">
-              <i class="fas fa-calendar text-green-500 w-3"></i>
-              <span>2024년 생태적 공론장 운영 중</span>
-            </div>
-          </div>
+          <p class="text-green-200 text-xs leading-relaxed mb-2">
+            이 질문이 에코칼리지의 시작입니다. 지금까지의 삶에 의문을 품고, 다르게 살아야 한다는 것을 알지만, 어떻게 다르게 살아야할지 막막합니다. 우리는 그렇게 살도록 배운 적이 없으니까요.
+          </p>
+          <p class="text-green-200 text-xs leading-relaxed mb-2">
+            빨리, 많이, 나만을 외치던 것에서 벗어나, 천천히, 함께, 생명 모두의 세계를 만들려면, 새롭게 터득해야 합니다. 지금까지 배워왔던 방식에서 벗어나, 새롭게 상상하고, 먼저 살아보는 실험자가 되어야 하는 것이죠.
+          </p>
+          <p class="text-green-200 text-xs leading-relaxed mb-2">
+            지금, 지구와 우리의 삶이 어디로 가야할지 함께 묻고, 실험하고, 그 삶을 살아가는 새로운 개념의 학교를 시작하려고 합니다.
+          </p>
+          <p class="text-green-200 text-xs leading-relaxed mb-2">
+            삶이 바뀌려면, 우리가 지금까지 배우던 방식에서 벗어날 용기와 실천이 필요해요.
+          </p>
+          <p class="text-green-300 text-xs font-semibold leading-relaxed">
+            함께 모이면, 그 용기가 생깁니다.
+          </p>
         </div>
         <!-- 교육 철학 -->
         <div class="sub-menu-item" onclick="toggleSub('about-2',event)">
