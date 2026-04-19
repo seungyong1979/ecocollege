@@ -212,7 +212,7 @@ export async function mainPage(c: Context) {
 
     <!-- ABOUT -->
     <div class="side-nav-item border-l-4 border-transparent rounded-r-xl px-4 py-1" id="nav-about">
-      <div class="flex items-center justify-between py-3 cursor-pointer" onclick="showPanel('about')">
+      <div class="flex items-center justify-between py-3 cursor-pointer" onclick="showPanel('about',event)">
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-green-900 flex items-center justify-center flex-shrink-0">
             <i class="fas fa-seedling text-green-400 text-xs"></i>
@@ -293,7 +293,7 @@ export async function mainPage(c: Context) {
 
     <!-- PROGRAM -->
     <div class="side-nav-item border-l-4 border-transparent rounded-r-xl px-4 py-1" id="nav-program">
-      <div class="flex items-center justify-between py-3 cursor-pointer" onclick="showPanel('program')">
+      <div class="flex items-center justify-between py-3 cursor-pointer" onclick="showPanel('program',event)">
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-green-900 flex items-center justify-center flex-shrink-0">
             <i class="fas fa-calendar-alt text-green-400 text-xs"></i>
@@ -365,7 +365,7 @@ export async function mainPage(c: Context) {
 
     <!-- APPLY -->
     <div class="side-nav-item border-l-4 border-transparent rounded-r-xl px-4 py-1" id="nav-apply">
-      <div class="flex items-center justify-between py-3 cursor-pointer" onclick="showPanel('apply')">
+      <div class="flex items-center justify-between py-3 cursor-pointer" onclick="showPanel('apply',event)">
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-green-900 flex items-center justify-center flex-shrink-0">
             <i class="fas fa-paper-plane text-green-400 text-xs"></i>
@@ -765,7 +765,8 @@ function closeMenu() {
   document.body.style.overflow = ''
 }
 
-function showPanel(name) {
+function showPanel(name, event) {
+  if (event) event.stopPropagation()
   const panels = ['about', 'program', 'apply']
   panels.forEach(p => {
     const panel = document.getElementById('panel-' + p)
@@ -794,6 +795,7 @@ function showPanel(name) {
 
 function toggleSub(id, event) {
   event.stopPropagation()
+  event.preventDefault()
   const panel = document.getElementById('sub-panel-' + id)
   const arrow = document.getElementById('sub-arrow-' + id)
   if (!panel) return
