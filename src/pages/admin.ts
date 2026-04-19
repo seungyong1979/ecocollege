@@ -212,6 +212,66 @@ export async function adminPage(c: Context) {
               </div>
             </div>
           </div>
+          <!-- 메뉴 콘텐츠 편집 -->
+          <div class="bg-white rounded-xl shadow-sm border p-6">
+            <h3 class="font-bold text-gray-700 mb-4"><i class="fas fa-bars text-green-600 mr-2"></i>사이드 메뉴 콘텐츠</h3>
+            <p class="text-xs text-gray-400 mb-4">각 메뉴 항목을 클릭했을 때 표시되는 내용을 편집합니다. 줄바꿈(Enter)으로 단락을 구분합니다.</p>
+            <!-- ABOUT -->
+            <div class="mb-5">
+              <p class="text-sm font-bold text-green-700 mb-3 flex items-center gap-1"><i class="fas fa-seedling"></i> ABOUT</p>
+              <div class="space-y-3 pl-3 border-l-2 border-green-100">
+                <div>
+                  <label class="block text-xs font-semibold text-gray-600 mb-1">에코칼리지란?</label>
+                  <textarea id="s-about-eco" rows="5" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm transition-all resize-y"></textarea>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-600 mb-1">교육 철학</label>
+                  <textarea id="s-about-philosophy" rows="3" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm transition-all resize-y"></textarea>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-600 mb-1">운영 주체</label>
+                  <textarea id="s-about-org" rows="3" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm transition-all resize-y"></textarea>
+                </div>
+              </div>
+            </div>
+            <!-- PROGRAM -->
+            <div class="mb-5">
+              <p class="text-sm font-bold text-blue-700 mb-3 flex items-center gap-1"><i class="fas fa-calendar-alt"></i> PROGRAM</p>
+              <div class="space-y-3 pl-3 border-l-2 border-blue-100">
+                <div>
+                  <label class="block text-xs font-semibold text-gray-600 mb-1">2025 시범과정</label>
+                  <textarea id="s-prog-2025" rows="3" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm transition-all resize-y"></textarea>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-600 mb-1">2026 생태문명 전환 촉진자 양성 과정</label>
+                  <textarea id="s-prog-2026" rows="3" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm transition-all resize-y"></textarea>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-600 mb-1">생태공론장</label>
+                  <textarea id="s-prog-forum" rows="3" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm transition-all resize-y"></textarea>
+                </div>
+              </div>
+            </div>
+            <!-- APPLY -->
+            <div>
+              <p class="text-sm font-bold text-purple-700 mb-3 flex items-center gap-1"><i class="fas fa-paper-plane"></i> APPLY</p>
+              <div class="space-y-3 pl-3 border-l-2 border-purple-100">
+                <div>
+                  <label class="block text-xs font-semibold text-gray-600 mb-1">참여 안내</label>
+                  <textarea id="s-apply-guide" rows="3" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm transition-all resize-y"></textarea>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-600 mb-1">의제 등록</label>
+                  <textarea id="s-apply-agenda" rows="3" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm transition-all resize-y"></textarea>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-600 mb-1">문의하기</label>
+                  <textarea id="s-apply-contact" rows="2" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm transition-all resize-y"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="bg-white rounded-xl shadow-sm border p-6">
             <h3 class="font-bold text-gray-700 mb-4"><i class="fas fa-image text-blue-600 mr-2"></i>히어로 배경 이미지</h3>
             <input type="url" id="s-hero-image" placeholder="https://example.com/image.jpg"
@@ -505,6 +565,16 @@ async function loadSettings(){
       document.getElementById('s-footer-phone').value=s.footer_phone||''
       document.getElementById('s-footer-email').value=s.footer_email||''
       if(s.hero_image){document.getElementById('img-preview').src=s.hero_image;document.getElementById('img-preview-wrap').classList.remove('hidden')}
+      // 메뉴 콘텐츠
+      document.getElementById('s-about-eco').value=s.about_eco||''
+      document.getElementById('s-about-philosophy').value=s.about_philosophy||''
+      document.getElementById('s-about-org').value=s.about_org||''
+      document.getElementById('s-prog-2025').value=s.prog_2025||''
+      document.getElementById('s-prog-2026').value=s.prog_2026||''
+      document.getElementById('s-prog-forum').value=s.prog_forum||''
+      document.getElementById('s-apply-guide').value=s.apply_guide||''
+      document.getElementById('s-apply-agenda').value=s.apply_agenda||''
+      document.getElementById('s-apply-contact').value=s.apply_contact||''
     }
   } catch(e){}
 }
@@ -521,6 +591,16 @@ async function saveSettings(){
     footer_instagram:document.getElementById('s-footer-instagram').value,
     footer_phone:document.getElementById('s-footer-phone').value,
     footer_email:document.getElementById('s-footer-email').value,
+    // 메뉴 콘텐츠
+    about_eco:document.getElementById('s-about-eco').value,
+    about_philosophy:document.getElementById('s-about-philosophy').value,
+    about_org:document.getElementById('s-about-org').value,
+    prog_2025:document.getElementById('s-prog-2025').value,
+    prog_2026:document.getElementById('s-prog-2026').value,
+    prog_forum:document.getElementById('s-prog-forum').value,
+    apply_guide:document.getElementById('s-apply-guide').value,
+    apply_agenda:document.getElementById('s-apply-agenda').value,
+    apply_contact:document.getElementById('s-apply-contact').value,
   }
   const msgEl=document.getElementById('settings-msg')
   try {
