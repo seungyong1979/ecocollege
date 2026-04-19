@@ -211,9 +211,8 @@ export async function mainPage(c: Context) {
   <div class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
 
     <!-- ABOUT -->
-    <div class="side-nav-item border-l-4 border-transparent rounded-r-xl px-4 py-1 cursor-pointer"
-         onclick="showPanel('about')" id="nav-about">
-      <div class="flex items-center justify-between py-3">
+    <div class="side-nav-item border-l-4 border-transparent rounded-r-xl px-4 py-1" id="nav-about">
+      <div class="flex items-center justify-between py-3 cursor-pointer" onclick="showPanel('about')">
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-green-900 flex items-center justify-center flex-shrink-0">
             <i class="fas fa-seedling text-green-400 text-xs"></i>
@@ -293,9 +292,8 @@ export async function mainPage(c: Context) {
     <div class="border-t border-green-900 mx-2"></div>
 
     <!-- PROGRAM -->
-    <div class="side-nav-item border-l-4 border-transparent rounded-r-xl px-4 py-1 cursor-pointer"
-         onclick="showPanel('program')" id="nav-program">
-      <div class="flex items-center justify-between py-3">
+    <div class="side-nav-item border-l-4 border-transparent rounded-r-xl px-4 py-1" id="nav-program">
+      <div class="flex items-center justify-between py-3 cursor-pointer" onclick="showPanel('program')">
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-green-900 flex items-center justify-center flex-shrink-0">
             <i class="fas fa-calendar-alt text-green-400 text-xs"></i>
@@ -366,9 +364,8 @@ export async function mainPage(c: Context) {
     <div class="border-t border-green-900 mx-2"></div>
 
     <!-- APPLY -->
-    <div class="side-nav-item border-l-4 border-transparent rounded-r-xl px-4 py-1 cursor-pointer"
-         onclick="showPanel('apply')" id="nav-apply">
-      <div class="flex items-center justify-between py-3">
+    <div class="side-nav-item border-l-4 border-transparent rounded-r-xl px-4 py-1" id="nav-apply">
+      <div class="flex items-center justify-between py-3 cursor-pointer" onclick="showPanel('apply')">
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-green-900 flex items-center justify-center flex-shrink-0">
             <i class="fas fa-paper-plane text-green-400 text-xs"></i>
