@@ -4,6 +4,7 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { mainPage } from './pages/main'
 import { adminPage } from './pages/admin'
+import { infoPage, INFO_PAGES } from './pages/infoPage'
 import { apiRoutes } from './routes/api'
 import { adminRoutes } from './routes/adminApi'
 
@@ -22,6 +23,11 @@ app.use('/api/*', cors())
 app.get('/', mainPage)
 app.get('/admin', adminPage)
 app.get('/admin/*', adminPage)
+
+// 안내 페이지 (메뉴 하위 항목)
+Object.keys(INFO_PAGES).forEach(slug => {
+  app.get(`/info/${slug}`, (c) => infoPage(c, slug))
+})
 
 // API
 app.route('/api', apiRoutes)

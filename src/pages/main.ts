@@ -138,45 +138,40 @@ export async function mainPage(c: Context) {
     }
     .side-nav-item:hover::before { width: 100%; }
     .side-nav-item:hover { border-left-color: #22c55e !important; }
-    .side-panel {
-      display: none;
-      animation: panelIn 0.35s ease-out;
-    }
-    .side-panel.active { display: block; }
-    @keyframes panelIn { from{opacity:0;transform:translateX(15px)} to{opacity:1;transform:translateX(0)} }
-    .panel-tag {
-      display: inline-block;
-      background: rgba(34,197,94,0.15);
-      color: #4ade80;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      padding: 3px 10px;
-      border-radius: 20px;
-      margin-bottom: 12px;
-    }
-    /* 하위 메뉴 스타일 */
-    .sub-menu-item {
-      padding: 8px 10px;
-      margin-bottom: 2px;
+    /* 하위 메뉴 링크 스타일 */
+    .sub-menu-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 12px;
+      margin-bottom: 3px;
       background: rgba(20,83,45,0.5);
       border: 1px solid rgba(34,197,94,0.15);
       border-radius: 10px;
-      cursor: pointer;
-      transition: background 0.2s;
+      text-decoration: none;
+      transition: all 0.2s;
     }
-    .sub-menu-item:hover { background: rgba(22,101,52,0.7); }
-    .sub-panel {
-      display: none;
-      padding: 10px 12px 12px;
-      margin-bottom: 6px;
-      background: rgba(5,46,22,0.6);
-      border-left: 2px solid rgba(34,197,94,0.4);
-      border-radius: 0 8px 8px 8px;
-      animation: panelIn 0.25s ease-out;
+    .sub-menu-link:hover {
+      background: rgba(22,101,52,0.8);
+      border-color: rgba(34,197,94,0.4);
+      transform: translateX(3px);
     }
-    .sub-panel.active { display: block; }
-    .sub-arrow-rotate { transform: rotate(180deg); }
+    /* 카테고리 그룹 스타일 */
+    .menu-group {
+      background: rgba(5,46,22,0.4);
+      border: 1px solid rgba(34,197,94,0.1);
+      border-radius: 14px;
+      padding: 10px 8px;
+      margin-bottom: 8px;
+    }
+    .menu-group-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 6px 10px;
+      border-bottom: 1px solid rgba(34,197,94,0.15);
+      margin-bottom: 8px;
+    }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -195,9 +190,9 @@ export async function mainPage(c: Context) {
 <nav id="side-menu" role="navigation" aria-label="사이트 메뉴">
 
   <!-- 메뉴 헤더 -->
-  <div class="px-7 pt-8 pb-6 border-b border-green-900">
-    <div class="flex items-center gap-3 mb-1">
-      <div class="w-9 h-9 bg-green-700 rounded-xl flex items-center justify-center">
+  <div class="px-6 pt-8 pb-5 border-b border-green-900">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 bg-green-700 rounded-xl flex items-center justify-center flex-shrink-0">
         <i class="fas fa-leaf text-green-200 text-sm"></i>
       </div>
       <div>
@@ -207,208 +202,115 @@ export async function mainPage(c: Context) {
     </div>
   </div>
 
-  <!-- 메뉴 항목 -->
-  <div class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+  <!-- 메뉴 목록 -->
+  <div class="flex-1 px-4 py-5 overflow-y-auto space-y-3">
 
-    <!-- ABOUT -->
-    <div class="side-nav-item border-l-4 border-transparent rounded-r-xl px-4 py-1 cursor-pointer" id="nav-about" onclick="showPanel('about')">
-      <div class="flex items-center justify-between py-3">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-green-900 flex items-center justify-center flex-shrink-0">
-            <i class="fas fa-seedling text-green-400 text-xs"></i>
-          </div>
-          <div>
-            <p class="text-white font-black text-sm tracking-widest">ABOUT</p>
-            <p class="text-green-500 text-xs mt-0.5">단체 소개</p>
-          </div>
+    <!-- ABOUT 그룹 -->
+    <div class="menu-group">
+      <div class="menu-group-header">
+        <div class="w-7 h-7 rounded-lg bg-green-800 flex items-center justify-center flex-shrink-0">
+          <i class="fas fa-seedling text-green-400 text-xs"></i>
         </div>
-        <i class="fas fa-chevron-right text-green-600 text-xs transition-transform" id="arrow-about"></i>
+        <div>
+          <p class="text-white font-black text-xs tracking-widest">ABOUT</p>
+          <p class="text-green-500 text-xs">단체 소개</p>
+        </div>
       </div>
+      <a href="/info/about-eco" class="sub-menu-link">
+        <div class="flex items-center gap-2">
+          <i class="fas fa-leaf text-green-400 text-xs w-4 flex-shrink-0"></i>
+          <span class="text-white text-xs font-semibold">에코칼리지란?</span>
+        </div>
+        <i class="fas fa-chevron-right text-green-600 text-xs flex-shrink-0"></i>
+      </a>
+      <a href="/info/about-philosophy" class="sub-menu-link">
+        <div class="flex items-center gap-2">
+          <i class="fas fa-book-open text-green-400 text-xs w-4 flex-shrink-0"></i>
+          <span class="text-white text-xs font-semibold">교육 철학</span>
+        </div>
+        <i class="fas fa-chevron-right text-green-600 text-xs flex-shrink-0"></i>
+      </a>
+      <a href="/info/about-org" class="sub-menu-link">
+        <div class="flex items-center gap-2">
+          <i class="fas fa-users text-green-400 text-xs w-4 flex-shrink-0"></i>
+          <span class="text-white text-xs font-semibold">운영 주체</span>
+        </div>
+        <i class="fas fa-chevron-right text-green-600 text-xs flex-shrink-0"></i>
+      </a>
     </div>
 
-    <!-- 구분선 -->
-    <div class="border-t border-green-900 mx-2"></div>
-
-    <!-- PROGRAM -->
-    <div class="side-nav-item border-l-4 border-transparent rounded-r-xl px-4 py-1 cursor-pointer" id="nav-program" onclick="showPanel('program')">
-      <div class="flex items-center justify-between py-3">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-green-900 flex items-center justify-center flex-shrink-0">
-            <i class="fas fa-calendar-alt text-green-400 text-xs"></i>
-          </div>
-          <div>
-            <p class="text-white font-black text-sm tracking-widest">PROGRAM</p>
-            <p class="text-green-500 text-xs mt-0.5">운영 프로그램</p>
-          </div>
+    <!-- PROGRAM 그룹 -->
+    <div class="menu-group">
+      <div class="menu-group-header">
+        <div class="w-7 h-7 rounded-lg bg-green-800 flex items-center justify-center flex-shrink-0">
+          <i class="fas fa-calendar-alt text-green-400 text-xs"></i>
         </div>
-        <i class="fas fa-chevron-right text-green-600 text-xs transition-transform" id="arrow-program"></i>
+        <div>
+          <p class="text-white font-black text-xs tracking-widest">PROGRAM</p>
+          <p class="text-green-500 text-xs">운영 프로그램</p>
+        </div>
       </div>
+      <a href="/info/prog-2025" class="sub-menu-link">
+        <div class="flex items-center gap-2">
+          <i class="fas fa-seedling text-green-400 text-xs w-4 flex-shrink-0"></i>
+          <span class="text-white text-xs font-semibold">2025 시범과정</span>
+        </div>
+        <i class="fas fa-chevron-right text-green-600 text-xs flex-shrink-0"></i>
+      </a>
+      <a href="/info/prog-2026" class="sub-menu-link">
+        <div class="flex items-center gap-2">
+          <i class="fas fa-graduation-cap text-green-400 text-xs w-4 flex-shrink-0"></i>
+          <span class="text-white text-xs font-semibold leading-tight">2026 생태문명 전환 촉진자 양성 과정</span>
+        </div>
+        <i class="fas fa-chevron-right text-green-600 text-xs flex-shrink-0 ml-2"></i>
+      </a>
+      <a href="/info/prog-forum" class="sub-menu-link">
+        <div class="flex items-center gap-2">
+          <i class="fas fa-comments text-green-400 text-xs w-4 flex-shrink-0"></i>
+          <span class="text-white text-xs font-semibold">생태공론장</span>
+        </div>
+        <i class="fas fa-chevron-right text-green-600 text-xs flex-shrink-0"></i>
+      </a>
     </div>
 
-    <!-- 구분선 -->
-    <div class="border-t border-green-900 mx-2"></div>
-
-    <!-- APPLY -->
-    <div class="side-nav-item border-l-4 border-transparent rounded-r-xl px-4 py-1 cursor-pointer" id="nav-apply" onclick="showPanel('apply')">
-      <div class="flex items-center justify-between py-3">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-green-900 flex items-center justify-center flex-shrink-0">
-            <i class="fas fa-paper-plane text-green-400 text-xs"></i>
-          </div>
-          <div>
-            <p class="text-white font-black text-sm tracking-widest">APPLY</p>
-            <p class="text-green-500 text-xs mt-0.5">참여 신청</p>
-          </div>
+    <!-- APPLY 그룹 -->
+    <div class="menu-group">
+      <div class="menu-group-header">
+        <div class="w-7 h-7 rounded-lg bg-green-800 flex items-center justify-center flex-shrink-0">
+          <i class="fas fa-paper-plane text-green-400 text-xs"></i>
         </div>
-        <i class="fas fa-chevron-right text-green-600 text-xs transition-transform" id="arrow-apply"></i>
+        <div>
+          <p class="text-white font-black text-xs tracking-widest">APPLY</p>
+          <p class="text-green-500 text-xs">참여 신청</p>
+        </div>
       </div>
+      <a href="/info/apply-guide" class="sub-menu-link">
+        <div class="flex items-center gap-2">
+          <i class="fas fa-info-circle text-green-400 text-xs w-4 flex-shrink-0"></i>
+          <span class="text-white text-xs font-semibold">참여 안내</span>
+        </div>
+        <i class="fas fa-chevron-right text-green-600 text-xs flex-shrink-0"></i>
+      </a>
+      <a href="/info/apply-agenda" class="sub-menu-link">
+        <div class="flex items-center gap-2">
+          <i class="fas fa-pencil-alt text-green-400 text-xs w-4 flex-shrink-0"></i>
+          <span class="text-white text-xs font-semibold">의제 등록</span>
+        </div>
+        <i class="fas fa-chevron-right text-green-600 text-xs flex-shrink-0"></i>
+      </a>
+      <a href="/info/apply-contact" class="sub-menu-link">
+        <div class="flex items-center gap-2">
+          <i class="fas fa-envelope text-green-400 text-xs w-4 flex-shrink-0"></i>
+          <span class="text-white text-xs font-semibold">문의하기</span>
+        </div>
+        <i class="fas fa-chevron-right text-green-600 text-xs flex-shrink-0"></i>
+      </a>
     </div>
 
-  </div>
-
-  <!-- ── 패널 영역 (nav 아래, 스크롤 가능) ── -->
-  <div class="flex-1 overflow-y-auto px-4 pb-6">
-
-    <!-- ABOUT 패널 -->
-    <div class="side-panel" id="panel-about">
-      <p class="text-green-500 text-xs font-bold tracking-widest uppercase mb-3 mt-2">ABOUT</p>
-      <div class="sub-menu-item" onclick="toggleSub('about-1')">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <i class="fas fa-leaf text-green-400 text-xs w-4"></i>
-            <span class="text-white text-xs font-semibold">에코칼리지란?</span>
-          </div>
-          <i class="fas fa-chevron-down text-green-600 text-xs transition-transform" id="sub-arrow-about-1"></i>
-        </div>
-      </div>
-      <div class="sub-panel" id="sub-panel-about-1">
-        <div class="text-green-200 text-xs leading-relaxed menu-content">${toHtmlParagraphs(s.about_eco)}</div>
-      </div>
-      <div class="sub-menu-item" onclick="toggleSub('about-2')">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <i class="fas fa-book-open text-green-400 text-xs w-4"></i>
-            <span class="text-white text-xs font-semibold">교육 철학</span>
-          </div>
-          <i class="fas fa-chevron-down text-green-600 text-xs transition-transform" id="sub-arrow-about-2"></i>
-        </div>
-      </div>
-      <div class="sub-panel" id="sub-panel-about-2">
-        <div class="text-green-200 text-xs leading-relaxed menu-content">${toHtmlParagraphs(s.about_philosophy)}</div>
-      </div>
-      <div class="sub-menu-item" onclick="toggleSub('about-3')">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <i class="fas fa-users text-green-400 text-xs w-4"></i>
-            <span class="text-white text-xs font-semibold">운영 주체</span>
-          </div>
-          <i class="fas fa-chevron-down text-green-600 text-xs transition-transform" id="sub-arrow-about-3"></i>
-        </div>
-      </div>
-      <div class="sub-panel" id="sub-panel-about-3">
-        <div class="text-green-200 text-xs leading-relaxed menu-content mb-2">${toHtmlParagraphs(s.about_org)}</div>
-        <div class="flex gap-2 pt-1">
-          <a href="${s.footer_blog}" target="_blank" class="flex-1 flex items-center justify-center gap-1 bg-green-900 hover:bg-green-800 text-green-300 text-xs font-semibold py-2 rounded-lg transition-all"><i class="fas fa-blog text-xs"></i> 블로그</a>
-          <a href="${s.footer_instagram}" target="_blank" class="flex-1 flex items-center justify-center gap-1 bg-green-900 hover:bg-green-800 text-green-300 text-xs font-semibold py-2 rounded-lg transition-all"><i class="fab fa-instagram text-xs"></i> 인스타</a>
-          <a href="${s.footer_facebook}" target="_blank" class="flex-1 flex items-center justify-center gap-1 bg-green-900 hover:bg-green-800 text-green-300 text-xs font-semibold py-2 rounded-lg transition-all"><i class="fab fa-facebook text-xs"></i> 페북</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- PROGRAM 패널 -->
-    <div class="side-panel" id="panel-program">
-      <p class="text-green-500 text-xs font-bold tracking-widest uppercase mb-3 mt-2">PROGRAM</p>
-      <div class="sub-menu-item" onclick="toggleSub('prog-1')">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <i class="fas fa-seedling text-green-400 text-xs w-4"></i>
-            <span class="text-white text-xs font-semibold">2025 시범과정</span>
-          </div>
-          <i class="fas fa-chevron-down text-green-600 text-xs transition-transform" id="sub-arrow-prog-1"></i>
-        </div>
-      </div>
-      <div class="sub-panel" id="sub-panel-prog-1">
-        <div class="text-green-200 text-xs leading-relaxed menu-content">${toHtmlParagraphs(s.prog_2025)}</div>
-      </div>
-      <div class="sub-menu-item" onclick="toggleSub('prog-2')">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <i class="fas fa-graduation-cap text-green-400 text-xs w-4"></i>
-            <span class="text-white text-xs font-semibold leading-tight">2026 생태문명 전환 촉진자 양성 과정</span>
-          </div>
-          <i class="fas fa-chevron-down text-green-600 text-xs transition-transform flex-shrink-0 ml-2" id="sub-arrow-prog-2"></i>
-        </div>
-      </div>
-      <div class="sub-panel" id="sub-panel-prog-2">
-        <div class="text-green-200 text-xs leading-relaxed menu-content">${toHtmlParagraphs(s.prog_2026)}</div>
-      </div>
-      <div class="sub-menu-item" onclick="toggleSub('prog-3')">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <i class="fas fa-comments text-green-400 text-xs w-4"></i>
-            <span class="text-white text-xs font-semibold">생태공론장</span>
-          </div>
-          <i class="fas fa-chevron-down text-green-600 text-xs transition-transform" id="sub-arrow-prog-3"></i>
-        </div>
-      </div>
-      <div class="sub-panel" id="sub-panel-prog-3">
-        <div class="text-green-200 text-xs leading-relaxed menu-content mb-2">${toHtmlParagraphs(s.prog_forum)}</div>
-        <button onclick="closeMenu(); setTimeout(()=>{ document.getElementById('main-agenda-input').scrollIntoView({behavior:'smooth'}); setTimeout(()=>document.getElementById('main-agenda-input').focus(),600) },300)"
-          class="mt-2 w-full flex items-center justify-center gap-2 bg-green-700 hover:bg-green-600 text-white text-xs font-bold py-2 rounded-xl transition-all">
-          <i class="fas fa-leaf"></i> 의제 등록하러 가기
-        </button>
-      </div>
-    </div>
-
-    <!-- APPLY 패널 -->
-    <div class="side-panel" id="panel-apply">
-      <p class="text-green-500 text-xs font-bold tracking-widest uppercase mb-3 mt-2">APPLY</p>
-      <div class="sub-menu-item" onclick="toggleSub('apply-1')">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <i class="fas fa-info-circle text-green-400 text-xs w-4"></i>
-            <span class="text-white text-xs font-semibold">참여 안내</span>
-          </div>
-          <i class="fas fa-chevron-down text-green-600 text-xs transition-transform" id="sub-arrow-apply-1"></i>
-        </div>
-      </div>
-      <div class="sub-panel" id="sub-panel-apply-1">
-        <div class="text-green-200 text-xs leading-relaxed menu-content">${toHtmlParagraphs(s.apply_guide)}</div>
-      </div>
-      <div class="sub-menu-item" onclick="toggleSub('apply-2')">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <i class="fas fa-pencil-alt text-green-400 text-xs w-4"></i>
-            <span class="text-white text-xs font-semibold">의제 등록</span>
-          </div>
-          <i class="fas fa-chevron-down text-green-600 text-xs transition-transform" id="sub-arrow-apply-2"></i>
-        </div>
-      </div>
-      <div class="sub-panel" id="sub-panel-apply-2">
-        <div class="text-green-200 text-xs leading-relaxed menu-content mb-2">${toHtmlParagraphs(s.apply_agenda)}</div>
-        <button onclick="closeMenu(); setTimeout(()=>{ document.getElementById('main-agenda-input').scrollIntoView({behavior:'smooth'}); setTimeout(()=>document.getElementById('main-agenda-input').focus(),600) },300)"
-          class="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-500 text-white text-xs font-bold py-2.5 rounded-xl transition-all">
-          <i class="fas fa-leaf"></i> 의제 등록하러 가기
-        </button>
-      </div>
-      <div class="sub-menu-item" onclick="toggleSub('apply-3')">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <i class="fas fa-envelope text-green-400 text-xs w-4"></i>
-            <span class="text-white text-xs font-semibold">문의하기</span>
-          </div>
-          <i class="fas fa-chevron-down text-green-600 text-xs transition-transform" id="sub-arrow-apply-3"></i>
-        </div>
-      </div>
-      <div class="sub-panel" id="sub-panel-apply-3">
-        <div class="text-green-200 text-xs leading-relaxed menu-content mb-3">${toHtmlParagraphs(s.apply_contact)}</div>
-        <div class="space-y-2 pt-2 border-t border-green-900">
-          ${s.footer_phone ? `<a href="tel:${s.footer_phone}" class="flex items-center gap-2 text-green-300 hover:text-green-200 text-xs transition-colors"><i class="fas fa-phone text-green-500 w-4"></i>${s.footer_phone}</a>` : ''}
-          ${s.footer_email ? `<a href="mailto:${s.footer_email}" class="flex items-center gap-2 text-green-300 hover:text-green-200 text-xs transition-colors"><i class="fas fa-envelope text-green-500 w-4"></i>${s.footer_email}</a>` : ''}
-          <a href="${s.footer_blog}" target="_blank" class="flex items-center gap-2 text-green-300 hover:text-green-200 text-xs transition-colors"><i class="fas fa-blog text-green-500 w-4"></i>공식 블로그</a>
-        </div>
-      </div>
-    </div>
+    <!-- 의제 등록 빠른 링크 -->
+    <a href="/#agenda" onclick="closeMenu()" class="flex items-center justify-center gap-2 bg-green-700 hover:bg-green-600 text-white text-xs font-bold py-3 rounded-xl transition-all mt-2">
+      <i class="fas fa-leaf"></i> 의제 바로 등록하기
+    </a>
 
   </div>
 
@@ -705,8 +607,6 @@ let carouselInterval = null
 let carouselOffset = 0
 
 // ==================== 사이드 메뉴 ====================
-let currentPanel = null
-
 function toggleMenu() {
   const menu = document.getElementById('side-menu')
   const overlay = document.getElementById('menu-overlay')
@@ -727,42 +627,6 @@ function closeMenu() {
   document.getElementById('menu-overlay').classList.remove('open')
   document.getElementById('menu-toggle').classList.remove('menu-open')
   document.body.style.overflow = ''
-}
-
-function showPanel(name) {
-  const panels = ['about', 'program', 'apply']
-  panels.forEach(p => {
-    const panel = document.getElementById('panel-' + p)
-    const nav = document.getElementById('nav-' + p)
-    const arrow = document.getElementById('arrow-' + p)
-    if (p === name) {
-      if (currentPanel === name) {
-        // 같은 메뉴 다시 클릭 → 닫기
-        panel.classList.remove('active')
-        nav.style.borderLeftColor = 'transparent'
-        arrow.style.transform = 'rotate(0deg)'
-        currentPanel = null
-      } else {
-        panel.classList.add('active')
-        nav.style.borderLeftColor = '#22c55e'
-        arrow.style.transform = 'rotate(90deg)'
-        currentPanel = name
-      }
-    } else {
-      panel.classList.remove('active')
-      nav.style.borderLeftColor = 'transparent'
-      arrow.style.transform = 'rotate(0deg)'
-    }
-  })
-}
-
-function toggleSub(id) {
-  const panel = document.getElementById('sub-panel-' + id)
-  const arrow = document.getElementById('sub-arrow-' + id)
-  if (!panel) return
-  const isOpen = panel.classList.contains('active')
-  panel.classList.toggle('active', !isOpen)
-  if (arrow) arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)'
 }
 
 // ESC 키로 메뉴 닫기
