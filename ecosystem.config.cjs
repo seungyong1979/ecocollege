@@ -8,7 +8,7 @@ module.exports = {
       env: {
         NODE_ENV: 'development',
         PORT: 3000,
-        DB_DIR: '/home/user/webapp/data'
+        DB_DIR: '/home/user/ecocollege_data'
       },
       watch: false,
       instances: 1,
