@@ -83,7 +83,6 @@ export async function newsletterListPage(c: Context) {
   const cards = newsletters.length
     ? newsletters.map((n, idx) => {
         const date = new Date(n.created_at).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })
-        const summary = n.summary ? n.summary.slice(0, 60) + (n.summary.length > 60 ? '…' : '') : ''
         const delay = idx * 80
         const href = '/newsletter/' + n.id
         const hasPdf = !!n.pdf_url
@@ -134,8 +133,7 @@ export async function newsletterListPage(c: Context) {
             <div class="flex items-center gap-1.5 mb-1">
               <span class="text-xs text-gray-400 truncate"><i class="fas fa-calendar-alt mr-1 text-green-500"></i>${date}</span>
             </div>
-            <h2 class="text-sm font-black text-gray-900 leading-snug line-clamp-2 mb-0.5">${n.title}</h2>
-            ${summary ? `<p class="text-xs text-gray-400 leading-relaxed line-clamp-2">${summary}</p>` : ''}
+            <h2 class="text-sm font-black text-gray-900 leading-snug line-clamp-2">${n.title}</h2>
           </div>
         </a>`
       }).join('')
@@ -248,7 +246,6 @@ ${commonNav('/newsletter', '소식지 목록')}
       </span>
     </div>
     <h1 class="text-xl sm:text-2xl font-black text-gray-900 leading-tight">${nl.title}</h1>
-    ${nl.summary ? `<p class="text-gray-500 text-sm mt-1 leading-relaxed">${nl.summary}</p>` : ''}
   </div>
 
   <!-- PDF 뷰어 -->
@@ -324,7 +321,6 @@ ${commonNav('/newsletter', '소식지 목록')}
       <span class="text-xs text-gray-400">${date}</span>
     </div>
     <h1 class="text-2xl sm:text-3xl font-black text-gray-900 leading-tight mb-2">${nl.title}</h1>
-    ${nl.summary ? `<p class="text-gray-500 text-sm leading-relaxed">${nl.summary}</p>` : ''}
     <div class="mt-4 h-1 w-16 rounded-full bg-green-500"></div>
   </div>
 

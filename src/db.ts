@@ -124,4 +124,15 @@ for (const [k, v] of settings) insertSetting.run(k, v)
 db.prepare(`INSERT OR IGNORE INTO admins (username, password_hash) VALUES (?, ?)`)
   .run('admin', 'ac9689e2272427085e35b9d3e3e8bed88cb3434828b43b86fc0596cad4c6e270')
 
+// ── 기존 DB 마이그레이션: 컬럼 누락 시 안전하게 추가 ──
+try {
+  db.exec(`ALTER TABLE newsletters ADD COLUMN pdf_url TEXT NOT NULL DEFAULT ''`)
+} catch (_) { /* 이미 존재하면 무시 */ }
+try {
+  db.exec(`ALTER TABLE newsletters ADD COLUMN updated_at DATETIME DEFAULT (datetime('now','localtime'))`)
+} catch (_) { /* 이미 존재하면 무시 */ }
+try {
+  db.exec(`ALTER TABLE agendas ADD COLUMN email TEXT DEFAULT ''`)
+} catch (_) { /* 이미 존재하면 무시 */ }
+
 console.log(`✅ DB initialized: ${DB_PATH}`)

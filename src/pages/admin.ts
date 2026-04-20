@@ -475,10 +475,6 @@ export async function adminPage(c: Context) {
                 <input type="text" id="nl-title" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm transition-all" placeholder="소식지 제목">
               </div>
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">요약 (목록에서 보여지는 짧은 소개)</label>
-                <textarea id="nl-summary" rows="2" class="w-full border-2 border-gray-200 rounded-xl px-4 py-2 text-sm resize-none" placeholder="한두 줄 요약"></textarea>
-              </div>
-              <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">커버 이미지 URL</label>
                 <input type="url" id="nl-cover" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm" placeholder="https://example.com/image.jpg">
                 <div id="nl-cover-preview" class="mt-2 hidden"><img id="nl-cover-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="h-28 rounded-xl object-contain border bg-gray-50"></div>
@@ -941,7 +937,6 @@ function openNlEditor() {
   document.getElementById('nl-modal-title').textContent = '새 소식지 작성';
   (document.getElementById('nl-edit-id')).value = '';
   (document.getElementById('nl-title')).value = '';
-  (document.getElementById('nl-summary')).value = '';
   (document.getElementById('nl-cover')).value = '';
   (document.getElementById('nl-pdf-url')).value = '';
   (document.getElementById('nl-content')).value = '';
@@ -961,7 +956,6 @@ async function editNewsletter(id) {
     document.getElementById('nl-modal-title').textContent = '소식지 수정';
     (document.getElementById('nl-edit-id')).value = String(n.id);
     (document.getElementById('nl-title')).value = n.title || '';
-    (document.getElementById('nl-summary')).value = n.summary || '';
     (document.getElementById('nl-cover')).value = n.cover_image || '';
     (document.getElementById('nl-pdf-url')).value = n.pdf_url || '';
     (document.getElementById('nl-content')).value = n.content || '';
@@ -984,7 +978,6 @@ function closeNlModal() {
 async function saveNewsletter() {
   const id = (document.getElementById('nl-edit-id')).value
   const title = (document.getElementById('nl-title')).value.trim()
-  const summary = (document.getElementById('nl-summary')).value.trim()
   const cover_image = (document.getElementById('nl-cover')).value.trim()
   const pdf_url = (document.getElementById('nl-pdf-url')).value.trim()
   const content = (document.getElementById('nl-content')).value.trim()
@@ -994,7 +987,7 @@ async function saveNewsletter() {
   try {
     const method = id ? 'PUT' : 'POST'
     const url = id ? \`/api/admin/newsletters/\${id}\` : '/api/admin/newsletters'
-    const res = await aFetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify({ title, summary, cover_image, pdf_url, content, status }) })
+    const res = await aFetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify({ title, summary: '', cover_image, pdf_url, content, status }) })
     const json = await res.json()
     if (json.success) {
       msgEl.textContent = '✅ 저장되었습니다.'; msgEl.className = 'bg-green-50 text-green-700 text-sm p-3 rounded-xl'; msgEl.classList.remove('hidden')
