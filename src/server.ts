@@ -5,6 +5,7 @@ import { cors } from 'hono/cors'
 import { mainPage } from './pages/main'
 import { adminPage } from './pages/admin'
 import { infoPage, INFO_PAGES } from './pages/infoPage'
+import { newsletterListPage, newsletterDetailPage } from './pages/newsletterPage'
 import { apiRoutes } from './routes/api'
 import { adminRoutes } from './routes/adminApi'
 
@@ -28,6 +29,10 @@ app.get('/admin/*', adminPage)
 Object.keys(INFO_PAGES).forEach(slug => {
   app.get(`/info/${slug}`, (c) => infoPage(c, slug))
 })
+
+// 뉴스레터
+app.get('/newsletter', newsletterListPage)
+app.get('/newsletter/:id', newsletterDetailPage)
 
 // API
 app.route('/api', apiRoutes)

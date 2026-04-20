@@ -43,8 +43,21 @@ db.exec(`
     updated_at DATETIME DEFAULT (datetime('now','localtime'))
   );
 
+  CREATE TABLE IF NOT EXISTS newsletters (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL DEFAULT '',
+    summary TEXT NOT NULL DEFAULT '',
+    cover_image TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL DEFAULT 'published',
+    created_at DATETIME DEFAULT (datetime('now','localtime')),
+    updated_at DATETIME DEFAULT (datetime('now','localtime'))
+  );
+
   CREATE INDEX IF NOT EXISTS idx_agendas_status ON agendas(status);
   CREATE INDEX IF NOT EXISTS idx_agendas_created_at ON agendas(created_at);
+  CREATE INDEX IF NOT EXISTS idx_newsletters_status ON newsletters(status);
+  CREATE INDEX IF NOT EXISTS idx_newsletters_created_at ON newsletters(created_at);
 `)
 
 // 기본 설정값 삽입
@@ -82,6 +95,17 @@ const settings: [string, string][] = [
   ['apply_guide', '순천에코칼리지의 프로그램에 참여하시려면 공지되는 모집 일정에 따라 신청하시면 됩니다. 생태 의제 창구는 연중 상시 운영됩니다.'],
   ['apply_agenda', '순천에서 다뤄야 할 생태·환경 의제를 자유롭게 제안해 주세요. 제안하신 의제는 공론장 운영에 반영됩니다.'],
   ['apply_contact', '궁금하신 사항은 전화, 이메일, 또는 공식 블로그를 통해 문의해 주세요.'],
+  // 메뉴 표시/숨김 (1=표시, 0=숨김)
+  ['menu_visible_about_eco', '1'],
+  ['menu_visible_about_philosophy', '1'],
+  ['menu_visible_about_org', '1'],
+  ['menu_visible_prog_2025', '1'],
+  ['menu_visible_prog_2026', '1'],
+  ['menu_visible_prog_forum', '1'],
+  ['menu_visible_apply_guide', '1'],
+  ['menu_visible_apply_agenda', '1'],
+  ['menu_visible_apply_contact', '1'],
+  ['menu_visible_newsletter', '1'],
 ]
 for (const [k, v] of settings) insertSetting.run(k, v)
 

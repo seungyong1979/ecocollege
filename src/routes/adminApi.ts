@@ -160,6 +160,66 @@ adminRoutes.post('/settings', authMiddleware, async (c) => {
   }
 })
 
+// ── 뉴스레터 API ────────────────────────────────────────────────
+// 목록
+adminRoutes.get('/newsletters', authMiddleware, (c) => {
+  try {
+    const rows = db.prepare(`SELECT id, title, summary, cover_image, status, created_at FROM newsletters ORDER BY created_at DESC`).all()
+    return c.json({ success: true, data: rows })
+  } catch (e) {
+    return c.json({ success: false, error: 'DB 오류' }, 500)
+  }
+})
+
+// 단건 조회
+adminRoutes.get('/newsletters/:id', authMiddleware, (c) => {
+  try {
+    const row = db.prepare(`SELECT * FROM newsletters WHERE id = ?`).get(c.req.param('id'))
+    if (!row) return c.json({ success: false, error: '없음' }, 404)
+    return c.json({ success: true, data: row })
+  } catch (e) {
+    return c.json({ success: false, error: 'DB 오류' }, 500)
+  }
+})
+
+// 생성
+adminRoutes.post('/newsletters', authMiddleware, async (c) => {
+  try {
+    const { title, content, summary, cover_image, status } = await c.req.json()
+    if (!title?.trim()) return c.json({ success: false, error: '제목을 입력해 주세요.' }, 400)
+    const result = db.prepare(
+      `INSERT INTO newsletters (title, content, summary, cover_image, status) VALUES (?, ?, ?, ?, ?)`
+    ).run(title.trim(), content || '', summary || '', cover_image || '', status || 'published') as any
+    return c.json({ success: true, id: result.lastInsertRowid })
+  } catch (e) {
+    return c.json({ success: false, error: '저장 오류' }, 500)
+  }
+})
+
+// 수정
+adminRoutes.put('/newsletters/:id', authMiddleware, async (c) => {
+  try {
+    const { title, content, summary, cover_image, status } = await c.req.json()
+    if (!title?.trim()) return c.json({ success: false, error: '제목을 입력해 주세요.' }, 400)
+    db.prepare(
+      `UPDATE newsletters SET title=?, content=?, summary=?, cover_image=?, status=?, updated_at=datetime('now','localtime') WHERE id=?`
+    ).run(title.trim(), content || '', summary || '', cover_image || '', status || 'published', c.req.param('id'))
+    return c.json({ success: true })
+  } catch (e) {
+    return c.json({ success: false, error: '수정 오류' }, 500)
+  }
+})
+
+// 삭제
+adminRoutes.delete('/newsletters/:id', authMiddleware, async (c) => {
+  try {
+    db.prepare(`DELETE FROM newsletters WHERE id = ?`).run(c.req.param('id'))
+    return c.json({ success: true })
+  } catch (e) {
+    return c.json({ success: false, error: '삭제 오류' }, 500)
+  }
+})
+
 // 통계
 adminRoutes.get('/stats', authMiddleware, (c) => {
   try {

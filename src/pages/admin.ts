@@ -20,6 +20,15 @@ export async function adminPage(c: Context) {
     .status-deleted { background:#fee2e2;color:#991b1b; }
     .modal-backdrop { background:rgba(0,0,0,0.5);backdrop-filter:blur(4px); }
     input:focus,textarea:focus,select:focus { outline:none;border-color:#16a34a !important;box-shadow:0 0 0 3px rgba(22,163,74,0.15); }
+    /* 토글 스위치 */
+    .menu-toggle-row { display:flex;align-items:center;justify-content:space-between;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:8px 12px;cursor:pointer;transition:background 0.15s; }
+    .menu-toggle-row:hover { background:#f0fdf4; }
+    .menu-toggle-label { font-size:12px;font-weight:600;color:#374151; }
+    .menu-toggle-cb { display:none; }
+    .menu-toggle-sw { position:relative;width:38px;height:22px;background:#d1d5db;border-radius:11px;flex-shrink:0;transition:background 0.2s; }
+    .menu-toggle-sw::after { content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;background:white;border-radius:50%;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2); }
+    .menu-toggle-cb:checked + .menu-toggle-sw { background:#16a34a; }
+    .menu-toggle-cb:checked + .menu-toggle-sw::after { transform:translateX(16px); }
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -79,6 +88,10 @@ export async function adminPage(c: Context) {
       <a onclick="showSection('settings')" id="nav-settings"
         class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer text-green-100 hover:text-white">
         <i class="fas fa-cog w-4"></i><span>사이트 설정</span>
+      </a>
+      <a onclick="showSection('newsletter')" id="nav-newsletter"
+        class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer text-green-100 hover:text-white">
+        <i class="fas fa-newspaper w-4"></i><span>소식지 관리</span>
       </a>
       <a onclick="showSection('account')" id="nav-account"
         class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer text-green-100 hover:text-white">
@@ -393,10 +406,104 @@ export async function adminPage(c: Context) {
               </div>
             </div>
           </div>
+          <!-- 메뉴 표시/숨김 제어 -->
+          <div class="bg-white rounded-xl shadow-sm border p-6">
+            <h3 class="font-bold text-gray-700 mb-2"><i class="fas fa-eye text-indigo-600 mr-2"></i>메뉴 표시/숨김</h3>
+            <p class="text-xs text-gray-400 mb-4">토글을 끄면 사이드 메뉴에서 해당 항목이 숨겨집니다.</p>
+            <div class="space-y-2">
+              <!-- ABOUT -->
+              <p class="text-xs font-bold text-green-700 mt-3 mb-1"><i class="fas fa-seedling mr-1"></i>ABOUT</p>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <label class="menu-toggle-row"><span class="menu-toggle-label">에코칼리지란?</span><input type="checkbox" id="mv-about-eco" class="menu-toggle-cb"><span class="menu-toggle-sw"></span></label>
+                <label class="menu-toggle-row"><span class="menu-toggle-label">교육 철학</span><input type="checkbox" id="mv-about-philosophy" class="menu-toggle-cb"><span class="menu-toggle-sw"></span></label>
+                <label class="menu-toggle-row"><span class="menu-toggle-label">운영 주체</span><input type="checkbox" id="mv-about-org" class="menu-toggle-cb"><span class="menu-toggle-sw"></span></label>
+              </div>
+              <!-- PROGRAM -->
+              <p class="text-xs font-bold text-blue-700 mt-3 mb-1"><i class="fas fa-calendar-alt mr-1"></i>PROGRAM</p>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <label class="menu-toggle-row"><span class="menu-toggle-label">2025 시범과정</span><input type="checkbox" id="mv-prog-2025" class="menu-toggle-cb"><span class="menu-toggle-sw"></span></label>
+                <label class="menu-toggle-row"><span class="menu-toggle-label">2026 양성과정</span><input type="checkbox" id="mv-prog-2026" class="menu-toggle-cb"><span class="menu-toggle-sw"></span></label>
+                <label class="menu-toggle-row"><span class="menu-toggle-label">생태공론장</span><input type="checkbox" id="mv-prog-forum" class="menu-toggle-cb"><span class="menu-toggle-sw"></span></label>
+              </div>
+              <!-- APPLY -->
+              <p class="text-xs font-bold text-purple-700 mt-3 mb-1"><i class="fas fa-paper-plane mr-1"></i>APPLY</p>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <label class="menu-toggle-row"><span class="menu-toggle-label">참여 안내</span><input type="checkbox" id="mv-apply-guide" class="menu-toggle-cb"><span class="menu-toggle-sw"></span></label>
+                <label class="menu-toggle-row"><span class="menu-toggle-label">의제 등록</span><input type="checkbox" id="mv-apply-agenda" class="menu-toggle-cb"><span class="menu-toggle-sw"></span></label>
+                <label class="menu-toggle-row"><span class="menu-toggle-label">문의하기</span><input type="checkbox" id="mv-apply-contact" class="menu-toggle-cb"><span class="menu-toggle-sw"></span></label>
+              </div>
+              <!-- NEWSLETTER -->
+              <p class="text-xs font-bold text-orange-700 mt-3 mb-1"><i class="fas fa-newspaper mr-1"></i>NEWSLETTER</p>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <label class="menu-toggle-row"><span class="menu-toggle-label">소식지 메뉴</span><input type="checkbox" id="mv-newsletter" class="menu-toggle-cb"><span class="menu-toggle-sw"></span></label>
+              </div>
+            </div>
+          </div>
+
           <div id="settings-msg" class="hidden text-sm p-3 rounded-xl"></div>
           <button onclick="saveSettings()" class="w-full bg-green-700 hover:bg-green-800 text-white font-bold py-4 rounded-xl transition-all">
             <i class="fas fa-save mr-2"></i>설정 저장하기
           </button>
+        </div>
+      </section>
+
+      <!-- 소식지(뉴스레터) 관리 -->
+      <section id="sec-newsletter" class="hidden">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-black text-gray-800">소식지 관리</h2>
+          <button onclick="openNlEditor()" class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-5 py-2.5 rounded-xl transition-all text-sm">
+            <i class="fas fa-plus"></i> 새 소식지
+          </button>
+        </div>
+
+        <!-- 목록 -->
+        <div id="nl-list" class="space-y-3">
+          <div class="text-center py-10 text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>불러오는 중...</div>
+        </div>
+
+        <!-- 에디터 모달 -->
+        <div id="nl-modal" class="hidden fixed inset-0 z-50 flex items-start justify-center pt-8 px-4 pb-8" style="background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);overflow-y:auto">
+          <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl my-auto" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between px-6 py-4 border-b">
+              <h3 id="nl-modal-title" class="text-lg font-black text-gray-800">새 소식지 작성</h3>
+              <button onclick="closeNlModal()" class="text-gray-400 hover:text-gray-600 text-xl"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+              <input type="hidden" id="nl-edit-id">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">제목 <span class="text-red-400">*</span></label>
+                <input type="text" id="nl-title" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm transition-all" placeholder="소식지 제목">
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">요약 (목록에서 보여지는 짧은 소개)</label>
+                <textarea id="nl-summary" rows="2" class="w-full border-2 border-gray-200 rounded-xl px-4 py-2 text-sm resize-none" placeholder="한두 줄 요약"></textarea>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">커버 이미지 URL</label>
+                <input type="url" id="nl-cover" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm" placeholder="https://example.com/image.jpg">
+                <div id="nl-cover-preview" class="mt-2 hidden"><img id="nl-cover-img" src="" class="h-28 rounded-xl object-cover border"></div>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">본문 내용</label>
+                <p class="text-xs text-gray-400 mb-1">## 제목, ### 소제목, &gt; 인용, - 목록, 이미지 URL 단독 입력, 빈 줄로 단락 구분</p>
+                <textarea id="nl-content" rows="12" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-mono resize-y" placeholder="내용을 입력하세요...&#10;&#10;## 소제목&#10;내용..."></textarea>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">공개 상태</label>
+                <select id="nl-status" class="border-2 border-gray-200 rounded-xl px-4 py-2 text-sm">
+                  <option value="published">공개</option>
+                  <option value="draft">비공개(초안)</option>
+                </select>
+              </div>
+              <div id="nl-msg" class="hidden text-sm p-3 rounded-xl"></div>
+            </div>
+            <div class="px-6 pb-6 flex gap-3">
+              <button onclick="closeNlModal()" class="flex-1 border-2 border-gray-200 hover:border-gray-300 text-gray-600 font-semibold py-3 rounded-xl transition-all text-sm">취소</button>
+              <button onclick="saveNewsletter()" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition-all text-sm">
+                <i class="fas fa-save mr-1"></i> 저장하기
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -512,13 +619,14 @@ function showAdminMain() {
 }
 
 function showSection(name) {
-  ['dashboard','agendas','settings','account'].forEach(s => {
+  ['dashboard','agendas','settings','newsletter','account'].forEach(s => {
     document.getElementById('sec-'+s).classList.toggle('hidden',s!==name)
     document.getElementById('nav-'+s).classList.toggle('active',s===name)
   })
   if (name==='agendas') loadAdminAgendas(1)
   if (name==='settings') loadSettings()
   if (name==='dashboard') loadStats()
+  if (name==='newsletter') loadNewsletters()
 }
 
 async function loadStats() {
@@ -652,6 +760,18 @@ async function loadSettings(){
       document.getElementById('s-footer-phone').value=s.footer_phone||''
       document.getElementById('s-footer-email').value=s.footer_email||''
       if(s.hero_image){document.getElementById('img-preview').src=s.hero_image;document.getElementById('img-preview-wrap').classList.remove('hidden')}
+      // 메뉴 표시/숨김 토글
+      const mvMap = {
+        'mv-about-eco':'menu_visible_about_eco','mv-about-philosophy':'menu_visible_about_philosophy',
+        'mv-about-org':'menu_visible_about_org','mv-prog-2025':'menu_visible_prog_2025',
+        'mv-prog-2026':'menu_visible_prog_2026','mv-prog-forum':'menu_visible_prog_forum',
+        'mv-apply-guide':'menu_visible_apply_guide','mv-apply-agenda':'menu_visible_apply_agenda',
+        'mv-apply-contact':'menu_visible_apply_contact','mv-newsletter':'menu_visible_newsletter'
+      }
+      Object.entries(mvMap).forEach(([elId, key]) => {
+        const el = document.getElementById(elId) as HTMLInputElement
+        if (el) el.checked = s[key] !== '0'
+      })
       // 메뉴 콘텐츠 & 이미지
       document.getElementById('s-about-eco').value=s.about_eco||''
       document.getElementById('s-about-eco-img').value=s.about_eco_img||''
@@ -687,6 +807,17 @@ async function saveSettings(){
     footer_instagram:document.getElementById('s-footer-instagram').value,
     footer_phone:document.getElementById('s-footer-phone').value,
     footer_email:document.getElementById('s-footer-email').value,
+    // 메뉴 표시/숨김
+    menu_visible_about_eco: (document.getElementById('mv-about-eco') as HTMLInputElement).checked ? '1' : '0',
+    menu_visible_about_philosophy: (document.getElementById('mv-about-philosophy') as HTMLInputElement).checked ? '1' : '0',
+    menu_visible_about_org: (document.getElementById('mv-about-org') as HTMLInputElement).checked ? '1' : '0',
+    menu_visible_prog_2025: (document.getElementById('mv-prog-2025') as HTMLInputElement).checked ? '1' : '0',
+    menu_visible_prog_2026: (document.getElementById('mv-prog-2026') as HTMLInputElement).checked ? '1' : '0',
+    menu_visible_prog_forum: (document.getElementById('mv-prog-forum') as HTMLInputElement).checked ? '1' : '0',
+    menu_visible_apply_guide: (document.getElementById('mv-apply-guide') as HTMLInputElement).checked ? '1' : '0',
+    menu_visible_apply_agenda: (document.getElementById('mv-apply-agenda') as HTMLInputElement).checked ? '1' : '0',
+    menu_visible_apply_contact: (document.getElementById('mv-apply-contact') as HTMLInputElement).checked ? '1' : '0',
+    menu_visible_newsletter: (document.getElementById('mv-newsletter') as HTMLInputElement).checked ? '1' : '0',
     // 메뉴 콘텐츠 & 이미지
     about_eco:document.getElementById('s-about-eco').value,
     about_eco_img:document.getElementById('s-about-eco-img').value,
@@ -740,6 +871,142 @@ function aFetch(url,options={}){
 }
 function esc(t){if(!t)return'';const d=document.createElement('div');d.appendChild(document.createTextNode(String(t)));return d.innerHTML}
 function maskPh(p){if(!p)return'-';return p.replace(/(\d{3})\d{3,4}(\d{4})/,'$1****$2')}
+
+// ==================== 뉴스레터 관리 ====================
+async function loadNewsletters() {
+  const container = document.getElementById('nl-list')
+  container.innerHTML = '<div class="text-center py-10 text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>불러오는 중...</div>'
+  try {
+    const res = await aFetch('/api/admin/newsletters')
+    const json = await res.json()
+    if (!json.success) throw new Error()
+    const list = json.data
+    if (!list.length) {
+      container.innerHTML = \`<div class="text-center py-14 text-gray-400">
+        <i class="fas fa-newspaper text-5xl text-green-200 mb-4 block"></i>
+        <p class="font-semibold">등록된 소식지가 없습니다.</p>
+        <p class="text-sm mt-1">위의 "새 소식지" 버튼으로 작성해 보세요.</p>
+      </div>\`
+      return
+    }
+    container.innerHTML = list.map(n => {
+      const date = new Date(n.created_at).toLocaleDateString('ko-KR',{year:'numeric',month:'short',day:'numeric'})
+      const isDraft = n.status === 'draft'
+      const summary = n.summary ? esc(n.summary).slice(0,60)+(n.summary.length>60?'…':'') : ''
+      return \`<div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-start gap-4">
+        <div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
+          \${n.cover_image
+            ? \`<img src="\${n.cover_image}" class="w-full h-full object-cover">\`
+            : \`<div class="w-full h-full bg-gradient-to-br from-green-700 to-green-500 flex items-center justify-center"><i class="fas fa-newspaper text-white text-xl opacity-60"></i></div>\`}
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full \${isDraft ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}">\${isDraft ? '초안' : '공개'}</span>
+            <span class="text-xs text-gray-400">\${date}</span>
+          </div>
+          <p class="font-bold text-gray-800 text-sm truncate">\${esc(n.title)}</p>
+          \${summary ? \`<p class="text-xs text-gray-400 mt-0.5 truncate">\${summary}</p>\` : ''}
+        </div>
+        <div class="flex flex-col gap-2 flex-shrink-0">
+          <a href="/newsletter/\${n.id}" target="_blank" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg font-semibold transition-all text-center"><i class="fas fa-eye mr-1"></i>보기</a>
+          <button onclick="editNewsletter(\${n.id})" class="text-xs bg-green-50 hover:bg-green-100 text-green-700 px-3 py-1.5 rounded-lg font-semibold transition-all"><i class="fas fa-edit mr-1"></i>수정</button>
+          <button onclick="deleteNewsletter(\${n.id}, '\${esc(n.title)}')" class="text-xs bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg font-semibold transition-all"><i class="fas fa-trash mr-1"></i>삭제</button>
+        </div>
+      </div>\`
+    }).join('')
+  } catch(e) {
+    container.innerHTML = '<div class="text-center py-10 text-red-400">불러오기 실패</div>'
+  }
+}
+
+function openNlEditor() {
+  document.getElementById('nl-modal-title').textContent = '새 소식지 작성';
+  (document.getElementById('nl-edit-id') as HTMLInputElement).value = '';
+  (document.getElementById('nl-title') as HTMLInputElement).value = '';
+  (document.getElementById('nl-summary') as HTMLTextAreaElement).value = '';
+  (document.getElementById('nl-cover') as HTMLInputElement).value = '';
+  (document.getElementById('nl-content') as HTMLTextAreaElement).value = '';
+  (document.getElementById('nl-status') as HTMLSelectElement).value = 'published';
+  document.getElementById('nl-cover-preview').classList.add('hidden')
+  document.getElementById('nl-msg').classList.add('hidden')
+  document.getElementById('nl-modal').classList.remove('hidden')
+  document.body.style.overflow = 'hidden'
+}
+
+async function editNewsletter(id: number) {
+  try {
+    const res = await aFetch(\`/api/admin/newsletters/\${id}\`)
+    const json = await res.json()
+    if (!json.success) return
+    const n = json.data
+    document.getElementById('nl-modal-title').textContent = '소식지 수정';
+    (document.getElementById('nl-edit-id') as HTMLInputElement).value = String(n.id);
+    (document.getElementById('nl-title') as HTMLInputElement).value = n.title || '';
+    (document.getElementById('nl-summary') as HTMLTextAreaElement).value = n.summary || '';
+    (document.getElementById('nl-cover') as HTMLInputElement).value = n.cover_image || '';
+    (document.getElementById('nl-content') as HTMLTextAreaElement).value = n.content || '';
+    (document.getElementById('nl-status') as HTMLSelectElement).value = n.status || 'published'
+    const prev = document.getElementById('nl-cover-preview')
+    const prevImg = document.getElementById('nl-cover-img') as HTMLImageElement
+    if (n.cover_image) { prevImg.src = n.cover_image; prev.classList.remove('hidden') }
+    else prev.classList.add('hidden')
+    document.getElementById('nl-msg').classList.add('hidden')
+    document.getElementById('nl-modal').classList.remove('hidden')
+    document.body.style.overflow = 'hidden'
+  } catch(e) { alert('불러오기 실패') }
+}
+
+function closeNlModal() {
+  document.getElementById('nl-modal').classList.add('hidden')
+  document.body.style.overflow = ''
+}
+
+async function saveNewsletter() {
+  const id = (document.getElementById('nl-edit-id') as HTMLInputElement).value
+  const title = (document.getElementById('nl-title') as HTMLInputElement).value.trim()
+  const summary = (document.getElementById('nl-summary') as HTMLTextAreaElement).value.trim()
+  const cover_image = (document.getElementById('nl-cover') as HTMLInputElement).value.trim()
+  const content = (document.getElementById('nl-content') as HTMLTextAreaElement).value.trim()
+  const status = (document.getElementById('nl-status') as HTMLSelectElement).value
+  const msgEl = document.getElementById('nl-msg')
+  if (!title) { msgEl.textContent = '제목을 입력해 주세요.'; msgEl.className = 'bg-red-50 text-red-600 text-sm p-3 rounded-xl'; msgEl.classList.remove('hidden'); return }
+  try {
+    const method = id ? 'PUT' : 'POST'
+    const url = id ? \`/api/admin/newsletters/\${id}\` : '/api/admin/newsletters'
+    const res = await aFetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify({ title, summary, cover_image, content, status }) })
+    const json = await res.json()
+    if (json.success) {
+      msgEl.textContent = '✅ 저장되었습니다.'; msgEl.className = 'bg-green-50 text-green-700 text-sm p-3 rounded-xl'; msgEl.classList.remove('hidden')
+      setTimeout(() => { closeNlModal(); loadNewsletters() }, 800)
+    } else {
+      msgEl.textContent = '❌ ' + (json.error || '저장 실패'); msgEl.className = 'bg-red-50 text-red-600 text-sm p-3 rounded-xl'; msgEl.classList.remove('hidden')
+    }
+  } catch(e) { msgEl.textContent = '❌ 오류 발생'; msgEl.className = 'bg-red-50 text-red-600 text-sm p-3 rounded-xl'; msgEl.classList.remove('hidden') }
+}
+
+async function deleteNewsletter(id: number, title: string) {
+  if (!confirm(\`"\${title}" 을(를) 삭제하시겠습니까?\`)) return
+  try {
+    const res = await aFetch(\`/api/admin/newsletters/\${id}\`, { method: 'DELETE' })
+    const json = await res.json()
+    if (json.success) loadNewsletters()
+    else alert('삭제 실패')
+  } catch(e) { alert('오류 발생') }
+}
+
+// 커버 이미지 미리보기
+document.addEventListener('DOMContentLoaded', () => {
+  const coverInput = document.getElementById('nl-cover') as HTMLInputElement
+  if (coverInput) {
+    coverInput.addEventListener('input', () => {
+      const url = coverInput.value.trim()
+      const prev = document.getElementById('nl-cover-preview')
+      const img = document.getElementById('nl-cover-img') as HTMLImageElement
+      if (url) { img.src = url; prev.classList.remove('hidden') }
+      else prev.classList.add('hidden')
+    })
+  }
+})
 </script>
 </body>
 </html>`

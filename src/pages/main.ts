@@ -33,7 +33,23 @@ export async function mainPage(c: Context) {
     apply_guide: settings['apply_guide'] || '',
     apply_agenda: settings['apply_agenda'] || '',
     apply_contact: settings['apply_contact'] || '',
+    // 메뉴 표시/숨김
+    mv_about_eco:        settings['menu_visible_about_eco']        !== '0',
+    mv_about_philosophy: settings['menu_visible_about_philosophy']  !== '0',
+    mv_about_org:        settings['menu_visible_about_org']         !== '0',
+    mv_prog_2025:        settings['menu_visible_prog_2025']         !== '0',
+    mv_prog_2026:        settings['menu_visible_prog_2026']         !== '0',
+    mv_prog_forum:       settings['menu_visible_prog_forum']        !== '0',
+    mv_apply_guide:      settings['menu_visible_apply_guide']       !== '0',
+    mv_apply_agenda:     settings['menu_visible_apply_agenda']      !== '0',
+    mv_apply_contact:    settings['menu_visible_apply_contact']     !== '0',
+    mv_newsletter:       settings['menu_visible_newsletter']        !== '0',
   }
+
+  // ABOUT 그룹 전체가 보일지 여부
+  const showAbout   = s.mv_about_eco || s.mv_about_philosophy || s.mv_about_org
+  const showProgram = s.mv_prog_2025 || s.mv_prog_2026 || s.mv_prog_forum
+  const showApply   = s.mv_apply_guide || s.mv_apply_agenda || s.mv_apply_contact
 
   const html = `<!DOCTYPE html>
 <html lang="ko">
@@ -205,7 +221,7 @@ export async function mainPage(c: Context) {
   <!-- 메뉴 목록 -->
   <div class="flex-1 px-4 py-5 overflow-y-auto space-y-3">
 
-    <!-- ABOUT 그룹 -->
+    ${showAbout ? `<!-- ABOUT 그룹 -->
     <div class="menu-group">
       <div class="menu-group-header">
         <div class="w-7 h-7 rounded-lg bg-green-800 flex items-center justify-center flex-shrink-0">
@@ -216,30 +232,30 @@ export async function mainPage(c: Context) {
           <p class="text-green-500 text-xs">단체 소개</p>
         </div>
       </div>
-      <a href="/info/about-eco" class="sub-menu-link">
+      ${s.mv_about_eco ? `<a href="/info/about-eco" class="sub-menu-link">
         <div class="flex items-center gap-2">
           <i class="fas fa-leaf text-green-400 text-xs w-4 flex-shrink-0"></i>
           <span class="text-white text-xs font-semibold">에코칼리지란?</span>
         </div>
         <i class="fas fa-chevron-right text-green-600 text-xs flex-shrink-0"></i>
-      </a>
-      <a href="/info/about-philosophy" class="sub-menu-link">
+      </a>` : ''}
+      ${s.mv_about_philosophy ? `<a href="/info/about-philosophy" class="sub-menu-link">
         <div class="flex items-center gap-2">
           <i class="fas fa-book-open text-green-400 text-xs w-4 flex-shrink-0"></i>
           <span class="text-white text-xs font-semibold">교육 철학</span>
         </div>
         <i class="fas fa-chevron-right text-green-600 text-xs flex-shrink-0"></i>
-      </a>
-      <a href="/info/about-org" class="sub-menu-link">
+      </a>` : ''}
+      ${s.mv_about_org ? `<a href="/info/about-org" class="sub-menu-link">
         <div class="flex items-center gap-2">
           <i class="fas fa-users text-green-400 text-xs w-4 flex-shrink-0"></i>
           <span class="text-white text-xs font-semibold">운영 주체</span>
         </div>
         <i class="fas fa-chevron-right text-green-600 text-xs flex-shrink-0"></i>
-      </a>
-    </div>
+      </a>` : ''}
+    </div>` : ''}
 
-    <!-- PROGRAM 그룹 -->
+    ${showProgram ? `<!-- PROGRAM 그룹 -->
     <div class="menu-group">
       <div class="menu-group-header">
         <div class="w-7 h-7 rounded-lg bg-green-800 flex items-center justify-center flex-shrink-0">
@@ -250,30 +266,30 @@ export async function mainPage(c: Context) {
           <p class="text-green-500 text-xs">운영 프로그램</p>
         </div>
       </div>
-      <a href="/info/prog-2025" class="sub-menu-link">
+      ${s.mv_prog_2025 ? `<a href="/info/prog-2025" class="sub-menu-link">
         <div class="flex items-center gap-2">
           <i class="fas fa-seedling text-green-400 text-xs w-4 flex-shrink-0"></i>
           <span class="text-white text-xs font-semibold">2025 시범과정</span>
         </div>
         <i class="fas fa-chevron-right text-green-600 text-xs flex-shrink-0"></i>
-      </a>
-      <a href="/info/prog-2026" class="sub-menu-link">
+      </a>` : ''}
+      ${s.mv_prog_2026 ? `<a href="/info/prog-2026" class="sub-menu-link">
         <div class="flex items-center gap-2">
           <i class="fas fa-graduation-cap text-green-400 text-xs w-4 flex-shrink-0"></i>
           <span class="text-white text-xs font-semibold leading-tight">2026 생태문명 전환 촉진자 양성 과정</span>
         </div>
         <i class="fas fa-chevron-right text-green-600 text-xs flex-shrink-0 ml-2"></i>
-      </a>
-      <a href="/info/prog-forum" class="sub-menu-link">
+      </a>` : ''}
+      ${s.mv_prog_forum ? `<a href="/info/prog-forum" class="sub-menu-link">
         <div class="flex items-center gap-2">
           <i class="fas fa-comments text-green-400 text-xs w-4 flex-shrink-0"></i>
           <span class="text-white text-xs font-semibold">생태공론장</span>
         </div>
         <i class="fas fa-chevron-right text-green-600 text-xs flex-shrink-0"></i>
-      </a>
-    </div>
+      </a>` : ''}
+    </div>` : ''}
 
-    <!-- APPLY 그룹 -->
+    ${showApply ? `<!-- APPLY 그룹 -->
     <div class="menu-group">
       <div class="menu-group-header">
         <div class="w-7 h-7 rounded-lg bg-green-800 flex items-center justify-center flex-shrink-0">
@@ -284,28 +300,48 @@ export async function mainPage(c: Context) {
           <p class="text-green-500 text-xs">참여 신청</p>
         </div>
       </div>
-      <a href="/info/apply-guide" class="sub-menu-link">
+      ${s.mv_apply_guide ? `<a href="/info/apply-guide" class="sub-menu-link">
         <div class="flex items-center gap-2">
           <i class="fas fa-info-circle text-green-400 text-xs w-4 flex-shrink-0"></i>
           <span class="text-white text-xs font-semibold">참여 안내</span>
         </div>
         <i class="fas fa-chevron-right text-green-600 text-xs flex-shrink-0"></i>
-      </a>
-      <a href="/info/apply-agenda" class="sub-menu-link">
+      </a>` : ''}
+      ${s.mv_apply_agenda ? `<a href="/info/apply-agenda" class="sub-menu-link">
         <div class="flex items-center gap-2">
           <i class="fas fa-pencil-alt text-green-400 text-xs w-4 flex-shrink-0"></i>
           <span class="text-white text-xs font-semibold">의제 등록</span>
         </div>
         <i class="fas fa-chevron-right text-green-600 text-xs flex-shrink-0"></i>
-      </a>
-      <a href="/info/apply-contact" class="sub-menu-link">
+      </a>` : ''}
+      ${s.mv_apply_contact ? `<a href="/info/apply-contact" class="sub-menu-link">
         <div class="flex items-center gap-2">
           <i class="fas fa-envelope text-green-400 text-xs w-4 flex-shrink-0"></i>
           <span class="text-white text-xs font-semibold">문의하기</span>
         </div>
         <i class="fas fa-chevron-right text-green-600 text-xs flex-shrink-0"></i>
+      </a>` : ''}
+    </div>` : ''}
+
+    ${s.mv_newsletter ? `<!-- NEWSLETTER 그룹 -->
+    <div class="menu-group">
+      <div class="menu-group-header">
+        <div class="w-7 h-7 rounded-lg bg-green-800 flex items-center justify-center flex-shrink-0">
+          <i class="fas fa-newspaper text-green-400 text-xs"></i>
+        </div>
+        <div>
+          <p class="text-white font-black text-xs tracking-widest">NEWSLETTER</p>
+          <p class="text-green-500 text-xs">소식지</p>
+        </div>
+      </div>
+      <a href="/newsletter" class="sub-menu-link">
+        <div class="flex items-center gap-2">
+          <i class="fas fa-list-ul text-green-400 text-xs w-4 flex-shrink-0"></i>
+          <span class="text-white text-xs font-semibold">소식지 목록</span>
+        </div>
+        <i class="fas fa-chevron-right text-green-600 text-xs flex-shrink-0"></i>
       </a>
-    </div>
+    </div>` : ''}
 
     <!-- 의제 등록 빠른 링크 -->
     <a href="/#agenda" onclick="closeMenu()" class="flex items-center justify-center gap-2 bg-green-700 hover:bg-green-600 text-white text-xs font-bold py-3 rounded-xl transition-all mt-2">
