@@ -57,6 +57,7 @@ db.exec(`
     content TEXT NOT NULL DEFAULT '',
     summary TEXT NOT NULL DEFAULT '',
     cover_image TEXT NOT NULL DEFAULT '',
+    pdf_url TEXT NOT NULL DEFAULT '',
     status TEXT NOT NULL DEFAULT 'published',
     created_at DATETIME DEFAULT (datetime('now','localtime')),
     updated_at DATETIME DEFAULT (datetime('now','localtime'))

@@ -481,12 +481,24 @@ export async function adminPage(c: Context) {
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">커버 이미지 URL</label>
                 <input type="url" id="nl-cover" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm" placeholder="https://example.com/image.jpg">
-                <div id="nl-cover-preview" class="mt-2 hidden"><img id="nl-cover-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="h-28 rounded-xl object-cover border"></div>
+                <div id="nl-cover-preview" class="mt-2 hidden"><img id="nl-cover-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="h-28 rounded-xl object-contain border bg-gray-50"></div>
+              </div>
+              <div class="bg-red-50 border border-red-100 rounded-xl p-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">
+                  <i class="fas fa-file-pdf text-red-500 mr-1"></i>PDF 링크 (구글 드라이브)
+                </label>
+                <p class="text-xs text-gray-400 mb-2">구글 드라이브 공유 링크를 붙여넣으세요. 클릭 시 인라인 PDF 뷰어로 바로 표시됩니다.</p>
+                <input type="url" id="nl-pdf-url" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm bg-white"
+                  placeholder="https://drive.google.com/file/d/…/view?usp=sharing">
+                <p class="text-xs text-gray-400 mt-1.5">
+                  <i class="fas fa-info-circle text-blue-400 mr-1"></i>
+                  구글 드라이브에서 파일 우클릭 → 공유 → 링크 복사 → 링크 공개 설정 확인 필요
+                </p>
               </div>
               <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">본문 내용</label>
+                <label class="block text-sm font-semibold text-gray-700 mb-1">본문 내용 <span class="text-gray-400 font-normal text-xs">(PDF가 있을 경우 선택 사항)</span></label>
                 <p class="text-xs text-gray-400 mb-1">## 제목, ### 소제목, &gt; 인용, - 목록, 이미지 URL 단독 입력, 빈 줄로 단락 구분</p>
-                <textarea id="nl-content" rows="12" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-mono resize-y" placeholder="내용을 입력하세요...&#10;&#10;## 소제목&#10;내용..."></textarea>
+                <textarea id="nl-content" rows="8" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm font-mono resize-y" placeholder="내용을 입력하세요...&#10;&#10;## 소제목&#10;내용..."></textarea>
               </div>
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">공개 상태</label>
@@ -894,18 +906,20 @@ async function loadNewsletters() {
       const isDraft = n.status === 'draft'
       const summary = n.summary ? esc(n.summary).slice(0,60)+(n.summary.length>60?'…':'') : ''
       const coverHtml = n.cover_image
-        ? '<img src="' + n.cover_image + '" class="w-full h-full object-cover">'
+        ? '<img src="' + n.cover_image + '" class="w-full h-full object-contain bg-gray-50">'
         : '<div class="w-full h-full bg-gradient-to-br from-green-700 to-green-500 flex items-center justify-center"><i class="fas fa-newspaper text-white text-xl opacity-60"></i></div>'
       const statusClass = isDraft ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'
       const statusLabel = isDraft ? '초안' : '공개'
       const summaryHtml = summary ? '<p class="text-xs text-gray-400 mt-0.5 truncate">' + summary + '</p>' : ''
+      const pdfBadge = n.pdf_url ? '<span class="text-xs bg-red-50 text-red-500 font-semibold px-1.5 py-0.5 rounded-full ml-1"><i class="fas fa-file-pdf mr-0.5"></i>PDF</span>' : ''
       return \`<div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-start gap-4">
         <div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
           \${coverHtml}
         </div>
         <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2 mb-1">
+          <div class="flex items-center gap-2 mb-1 flex-wrap">
             <span class="text-xs font-semibold px-2 py-0.5 rounded-full \${statusClass}">\${statusLabel}</span>
+            \${pdfBadge}
             <span class="text-xs text-gray-400">\${date}</span>
           </div>
           <p class="font-bold text-gray-800 text-sm truncate">\${esc(n.title)}</p>
@@ -929,6 +943,7 @@ function openNlEditor() {
   (document.getElementById('nl-title')).value = '';
   (document.getElementById('nl-summary')).value = '';
   (document.getElementById('nl-cover')).value = '';
+  (document.getElementById('nl-pdf-url')).value = '';
   (document.getElementById('nl-content')).value = '';
   (document.getElementById('nl-status')).value = 'published';
   document.getElementById('nl-cover-preview').classList.add('hidden')
@@ -948,6 +963,7 @@ async function editNewsletter(id) {
     (document.getElementById('nl-title')).value = n.title || '';
     (document.getElementById('nl-summary')).value = n.summary || '';
     (document.getElementById('nl-cover')).value = n.cover_image || '';
+    (document.getElementById('nl-pdf-url')).value = n.pdf_url || '';
     (document.getElementById('nl-content')).value = n.content || '';
     (document.getElementById('nl-status')).value = n.status || 'published'
     const prev = document.getElementById('nl-cover-preview')
@@ -970,6 +986,7 @@ async function saveNewsletter() {
   const title = (document.getElementById('nl-title')).value.trim()
   const summary = (document.getElementById('nl-summary')).value.trim()
   const cover_image = (document.getElementById('nl-cover')).value.trim()
+  const pdf_url = (document.getElementById('nl-pdf-url')).value.trim()
   const content = (document.getElementById('nl-content')).value.trim()
   const status = (document.getElementById('nl-status')).value
   const msgEl = document.getElementById('nl-msg')
@@ -977,7 +994,7 @@ async function saveNewsletter() {
   try {
     const method = id ? 'PUT' : 'POST'
     const url = id ? \`/api/admin/newsletters/\${id}\` : '/api/admin/newsletters'
-    const res = await aFetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify({ title, summary, cover_image, content, status }) })
+    const res = await aFetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify({ title, summary, cover_image, pdf_url, content, status }) })
     const json = await res.json()
     if (json.success) {
       msgEl.textContent = '✅ 저장되었습니다.'; msgEl.className = 'bg-green-50 text-green-700 text-sm p-3 rounded-xl'; msgEl.classList.remove('hidden')

@@ -164,7 +164,7 @@ adminRoutes.post('/settings', authMiddleware, async (c) => {
 // 목록
 adminRoutes.get('/newsletters', authMiddleware, (c) => {
   try {
-    const rows = db.prepare(`SELECT id, title, summary, cover_image, status, created_at FROM newsletters ORDER BY created_at DESC`).all()
+    const rows = db.prepare(`SELECT id, title, summary, cover_image, pdf_url, status, created_at FROM newsletters ORDER BY created_at DESC`).all()
     return c.json({ success: true, data: rows })
   } catch (e) {
     return c.json({ success: false, error: 'DB 오류' }, 500)
@@ -185,11 +185,11 @@ adminRoutes.get('/newsletters/:id', authMiddleware, (c) => {
 // 생성
 adminRoutes.post('/newsletters', authMiddleware, async (c) => {
   try {
-    const { title, content, summary, cover_image, status } = await c.req.json()
+    const { title, content, summary, cover_image, pdf_url, status } = await c.req.json()
     if (!title?.trim()) return c.json({ success: false, error: '제목을 입력해 주세요.' }, 400)
     const result = db.prepare(
-      `INSERT INTO newsletters (title, content, summary, cover_image, status) VALUES (?, ?, ?, ?, ?)`
-    ).run(title.trim(), content || '', summary || '', cover_image || '', status || 'published') as any
+      `INSERT INTO newsletters (title, content, summary, cover_image, pdf_url, status) VALUES (?, ?, ?, ?, ?, ?)`
+    ).run(title.trim(), content || '', summary || '', cover_image || '', pdf_url || '', status || 'published') as any
     return c.json({ success: true, id: result.lastInsertRowid })
   } catch (e) {
     return c.json({ success: false, error: '저장 오류' }, 500)
@@ -199,11 +199,11 @@ adminRoutes.post('/newsletters', authMiddleware, async (c) => {
 // 수정
 adminRoutes.put('/newsletters/:id', authMiddleware, async (c) => {
   try {
-    const { title, content, summary, cover_image, status } = await c.req.json()
+    const { title, content, summary, cover_image, pdf_url, status } = await c.req.json()
     if (!title?.trim()) return c.json({ success: false, error: '제목을 입력해 주세요.' }, 400)
     db.prepare(
-      `UPDATE newsletters SET title=?, content=?, summary=?, cover_image=?, status=?, updated_at=datetime('now','localtime') WHERE id=?`
-    ).run(title.trim(), content || '', summary || '', cover_image || '', status || 'published', c.req.param('id'))
+      `UPDATE newsletters SET title=?, content=?, summary=?, cover_image=?, pdf_url=?, status=?, updated_at=datetime('now','localtime') WHERE id=?`
+    ).run(title.trim(), content || '', summary || '', cover_image || '', pdf_url || '', status || 'published', c.req.param('id'))
     return c.json({ success: true })
   } catch (e) {
     return c.json({ success: false, error: '수정 오류' }, 500)
