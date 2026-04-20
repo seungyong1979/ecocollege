@@ -378,7 +378,7 @@ export async function adminPage(c: Context) {
               class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm transition-all">
             <p class="text-xs text-gray-400 mt-1">공개 이미지 URL. 비워두면 기본 그라데이션 배경이 사용됩니다.</p>
             <div id="img-preview-wrap" class="mt-3 hidden">
-              <img id="img-preview" src="" alt="미리보기" class="h-32 rounded-xl object-cover border">
+              <img id="img-preview" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="미리보기" class="h-32 rounded-xl object-cover border">
             </div>
           </div>
           <div class="bg-white rounded-xl shadow-sm border p-6">
@@ -481,7 +481,7 @@ export async function adminPage(c: Context) {
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">커버 이미지 URL</label>
                 <input type="url" id="nl-cover" class="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm" placeholder="https://example.com/image.jpg">
-                <div id="nl-cover-preview" class="mt-2 hidden"><img id="nl-cover-img" src="" class="h-28 rounded-xl object-cover border"></div>
+                <div id="nl-cover-preview" class="mt-2 hidden"><img id="nl-cover-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" class="h-28 rounded-xl object-cover border"></div>
               </div>
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">본문 내용</label>
@@ -769,7 +769,7 @@ async function loadSettings(){
         'mv-apply-contact':'menu_visible_apply_contact','mv-newsletter':'menu_visible_newsletter'
       }
       Object.entries(mvMap).forEach(([elId, key]) => {
-        const el = document.getElementById(elId) as HTMLInputElement
+        const el = document.getElementById(elId)
         if (el) el.checked = s[key] !== '0'
       })
       // 메뉴 콘텐츠 & 이미지
@@ -808,16 +808,16 @@ async function saveSettings(){
     footer_phone:document.getElementById('s-footer-phone').value,
     footer_email:document.getElementById('s-footer-email').value,
     // 메뉴 표시/숨김
-    menu_visible_about_eco: (document.getElementById('mv-about-eco') as HTMLInputElement).checked ? '1' : '0',
-    menu_visible_about_philosophy: (document.getElementById('mv-about-philosophy') as HTMLInputElement).checked ? '1' : '0',
-    menu_visible_about_org: (document.getElementById('mv-about-org') as HTMLInputElement).checked ? '1' : '0',
-    menu_visible_prog_2025: (document.getElementById('mv-prog-2025') as HTMLInputElement).checked ? '1' : '0',
-    menu_visible_prog_2026: (document.getElementById('mv-prog-2026') as HTMLInputElement).checked ? '1' : '0',
-    menu_visible_prog_forum: (document.getElementById('mv-prog-forum') as HTMLInputElement).checked ? '1' : '0',
-    menu_visible_apply_guide: (document.getElementById('mv-apply-guide') as HTMLInputElement).checked ? '1' : '0',
-    menu_visible_apply_agenda: (document.getElementById('mv-apply-agenda') as HTMLInputElement).checked ? '1' : '0',
-    menu_visible_apply_contact: (document.getElementById('mv-apply-contact') as HTMLInputElement).checked ? '1' : '0',
-    menu_visible_newsletter: (document.getElementById('mv-newsletter') as HTMLInputElement).checked ? '1' : '0',
+    menu_visible_about_eco: (document.getElementById('mv-about-eco')).checked ? '1' : '0',
+    menu_visible_about_philosophy: (document.getElementById('mv-about-philosophy')).checked ? '1' : '0',
+    menu_visible_about_org: (document.getElementById('mv-about-org')).checked ? '1' : '0',
+    menu_visible_prog_2025: (document.getElementById('mv-prog-2025')).checked ? '1' : '0',
+    menu_visible_prog_2026: (document.getElementById('mv-prog-2026')).checked ? '1' : '0',
+    menu_visible_prog_forum: (document.getElementById('mv-prog-forum')).checked ? '1' : '0',
+    menu_visible_apply_guide: (document.getElementById('mv-apply-guide')).checked ? '1' : '0',
+    menu_visible_apply_agenda: (document.getElementById('mv-apply-agenda')).checked ? '1' : '0',
+    menu_visible_apply_contact: (document.getElementById('mv-apply-contact')).checked ? '1' : '0',
+    menu_visible_newsletter: (document.getElementById('mv-newsletter')).checked ? '1' : '0',
     // 메뉴 콘텐츠 & 이미지
     about_eco:document.getElementById('s-about-eco').value,
     about_eco_img:document.getElementById('s-about-eco-img').value,
@@ -893,19 +893,23 @@ async function loadNewsletters() {
       const date = new Date(n.created_at).toLocaleDateString('ko-KR',{year:'numeric',month:'short',day:'numeric'})
       const isDraft = n.status === 'draft'
       const summary = n.summary ? esc(n.summary).slice(0,60)+(n.summary.length>60?'…':'') : ''
+      const coverHtml = n.cover_image
+        ? '<img src="' + n.cover_image + '" class="w-full h-full object-cover">'
+        : '<div class="w-full h-full bg-gradient-to-br from-green-700 to-green-500 flex items-center justify-center"><i class="fas fa-newspaper text-white text-xl opacity-60"></i></div>'
+      const statusClass = isDraft ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'
+      const statusLabel = isDraft ? '초안' : '공개'
+      const summaryHtml = summary ? '<p class="text-xs text-gray-400 mt-0.5 truncate">' + summary + '</p>' : ''
       return \`<div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-start gap-4">
         <div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
-          \${n.cover_image
-            ? \`<img src="\${n.cover_image}" class="w-full h-full object-cover">\`
-            : \`<div class="w-full h-full bg-gradient-to-br from-green-700 to-green-500 flex items-center justify-center"><i class="fas fa-newspaper text-white text-xl opacity-60"></i></div>\`}
+          \${coverHtml}
         </div>
         <div class="flex-1 min-w-0">
           <div class="flex items-center gap-2 mb-1">
-            <span class="text-xs font-semibold px-2 py-0.5 rounded-full \${isDraft ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}">\${isDraft ? '초안' : '공개'}</span>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full \${statusClass}">\${statusLabel}</span>
             <span class="text-xs text-gray-400">\${date}</span>
           </div>
           <p class="font-bold text-gray-800 text-sm truncate">\${esc(n.title)}</p>
-          \${summary ? \`<p class="text-xs text-gray-400 mt-0.5 truncate">\${summary}</p>\` : ''}
+          \${summaryHtml}
         </div>
         <div class="flex flex-col gap-2 flex-shrink-0">
           <a href="/newsletter/\${n.id}" target="_blank" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg font-semibold transition-all text-center"><i class="fas fa-eye mr-1"></i>보기</a>
@@ -921,33 +925,33 @@ async function loadNewsletters() {
 
 function openNlEditor() {
   document.getElementById('nl-modal-title').textContent = '새 소식지 작성';
-  (document.getElementById('nl-edit-id') as HTMLInputElement).value = '';
-  (document.getElementById('nl-title') as HTMLInputElement).value = '';
-  (document.getElementById('nl-summary') as HTMLTextAreaElement).value = '';
-  (document.getElementById('nl-cover') as HTMLInputElement).value = '';
-  (document.getElementById('nl-content') as HTMLTextAreaElement).value = '';
-  (document.getElementById('nl-status') as HTMLSelectElement).value = 'published';
+  (document.getElementById('nl-edit-id')).value = '';
+  (document.getElementById('nl-title')).value = '';
+  (document.getElementById('nl-summary')).value = '';
+  (document.getElementById('nl-cover')).value = '';
+  (document.getElementById('nl-content')).value = '';
+  (document.getElementById('nl-status')).value = 'published';
   document.getElementById('nl-cover-preview').classList.add('hidden')
   document.getElementById('nl-msg').classList.add('hidden')
   document.getElementById('nl-modal').classList.remove('hidden')
   document.body.style.overflow = 'hidden'
 }
 
-async function editNewsletter(id: number) {
+async function editNewsletter(id) {
   try {
     const res = await aFetch(\`/api/admin/newsletters/\${id}\`)
     const json = await res.json()
     if (!json.success) return
     const n = json.data
     document.getElementById('nl-modal-title').textContent = '소식지 수정';
-    (document.getElementById('nl-edit-id') as HTMLInputElement).value = String(n.id);
-    (document.getElementById('nl-title') as HTMLInputElement).value = n.title || '';
-    (document.getElementById('nl-summary') as HTMLTextAreaElement).value = n.summary || '';
-    (document.getElementById('nl-cover') as HTMLInputElement).value = n.cover_image || '';
-    (document.getElementById('nl-content') as HTMLTextAreaElement).value = n.content || '';
-    (document.getElementById('nl-status') as HTMLSelectElement).value = n.status || 'published'
+    (document.getElementById('nl-edit-id')).value = String(n.id);
+    (document.getElementById('nl-title')).value = n.title || '';
+    (document.getElementById('nl-summary')).value = n.summary || '';
+    (document.getElementById('nl-cover')).value = n.cover_image || '';
+    (document.getElementById('nl-content')).value = n.content || '';
+    (document.getElementById('nl-status')).value = n.status || 'published'
     const prev = document.getElementById('nl-cover-preview')
-    const prevImg = document.getElementById('nl-cover-img') as HTMLImageElement
+    const prevImg = document.getElementById('nl-cover-img')
     if (n.cover_image) { prevImg.src = n.cover_image; prev.classList.remove('hidden') }
     else prev.classList.add('hidden')
     document.getElementById('nl-msg').classList.add('hidden')
@@ -962,12 +966,12 @@ function closeNlModal() {
 }
 
 async function saveNewsletter() {
-  const id = (document.getElementById('nl-edit-id') as HTMLInputElement).value
-  const title = (document.getElementById('nl-title') as HTMLInputElement).value.trim()
-  const summary = (document.getElementById('nl-summary') as HTMLTextAreaElement).value.trim()
-  const cover_image = (document.getElementById('nl-cover') as HTMLInputElement).value.trim()
-  const content = (document.getElementById('nl-content') as HTMLTextAreaElement).value.trim()
-  const status = (document.getElementById('nl-status') as HTMLSelectElement).value
+  const id = (document.getElementById('nl-edit-id')).value
+  const title = (document.getElementById('nl-title')).value.trim()
+  const summary = (document.getElementById('nl-summary')).value.trim()
+  const cover_image = (document.getElementById('nl-cover')).value.trim()
+  const content = (document.getElementById('nl-content')).value.trim()
+  const status = (document.getElementById('nl-status')).value
   const msgEl = document.getElementById('nl-msg')
   if (!title) { msgEl.textContent = '제목을 입력해 주세요.'; msgEl.className = 'bg-red-50 text-red-600 text-sm p-3 rounded-xl'; msgEl.classList.remove('hidden'); return }
   try {
@@ -984,7 +988,7 @@ async function saveNewsletter() {
   } catch(e) { msgEl.textContent = '❌ 오류 발생'; msgEl.className = 'bg-red-50 text-red-600 text-sm p-3 rounded-xl'; msgEl.classList.remove('hidden') }
 }
 
-async function deleteNewsletter(id: number, title: string) {
+async function deleteNewsletter(id, title) {
   if (!confirm(\`"\${title}" 을(를) 삭제하시겠습니까?\`)) return
   try {
     const res = await aFetch(\`/api/admin/newsletters/\${id}\`, { method: 'DELETE' })
@@ -996,12 +1000,12 @@ async function deleteNewsletter(id: number, title: string) {
 
 // 커버 이미지 미리보기
 document.addEventListener('DOMContentLoaded', () => {
-  const coverInput = document.getElementById('nl-cover') as HTMLInputElement
+  const coverInput = document.getElementById('nl-cover')
   if (coverInput) {
     coverInput.addEventListener('input', () => {
       const url = coverInput.value.trim()
       const prev = document.getElementById('nl-cover-preview')
-      const img = document.getElementById('nl-cover-img') as HTMLImageElement
+      const img = document.getElementById('nl-cover-img')
       if (url) { img.src = url; prev.classList.remove('hidden') }
       else prev.classList.add('hidden')
     })

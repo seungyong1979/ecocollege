@@ -4,15 +4,54 @@ import { filterBadWords } from '../utils/auth'
 
 export const apiRoutes = new Hono()
 
-// 의제 목록 (공개)
+// 의제 목록 (공개) - 좋아요 수 포함
 apiRoutes.get('/agendas', (c) => {
   try {
     const rows = db.prepare(
-      `SELECT id, content, district, created_at FROM agendas WHERE status = 'visible' ORDER BY created_at DESC LIMIT 50`
+      `SELECT a.id, a.content, a.district, a.created_at,
+              COUNT(l.id) as likes
+       FROM agendas a
+       LEFT JOIN agenda_likes l ON l.agenda_id = a.id
+       WHERE a.status = 'visible'
+       GROUP BY a.id
+       ORDER BY a.created_at DESC LIMIT 50`
     ).all()
     return c.json({ success: true, data: rows })
   } catch (e) {
     return c.json({ success: false, error: 'DB 오류' }, 500)
+  }
+})
+
+// 좋아요 토글
+apiRoutes.post('/agendas/:id/like', async (c) => {
+  try {
+    const agendaId = c.req.param('id')
+    // voter_key: IP + User-Agent 해시 (쿠키 없이 간단 식별)
+    const ip = c.req.header('x-forwarded-for')?.split(',')[0]?.trim()
+      || c.req.header('x-real-ip')
+      || 'unknown'
+    const ua = c.req.header('user-agent') || ''
+    // 간단 해시: IP + UA 앞 50자 조합
+    const voterKey = Buffer.from(`${ip}:${ua.slice(0, 50)}`).toString('base64').slice(0, 32)
+
+    // 이미 좋아요 했는지 확인
+    const existing = db.prepare(
+      `SELECT id FROM agenda_likes WHERE agenda_id = ? AND voter_key = ?`
+    ).get(agendaId, voterKey)
+
+    if (existing) {
+      // 좋아요 취소
+      db.prepare(`DELETE FROM agenda_likes WHERE agenda_id = ? AND voter_key = ?`).run(agendaId, voterKey)
+    } else {
+      // 좋아요 추가
+      db.prepare(`INSERT OR IGNORE INTO agenda_likes (agenda_id, voter_key) VALUES (?, ?)`).run(agendaId, voterKey)
+    }
+
+    const { likes } = db.prepare(`SELECT COUNT(*) as likes FROM agenda_likes WHERE agenda_id = ?`).get(agendaId) as any
+    return c.json({ success: true, likes, liked: !existing })
+  } catch (e) {
+    console.error(e)
+    return c.json({ success: false, error: '오류가 발생했습니다.' }, 500)
   }
 })
 

@@ -43,6 +43,14 @@ db.exec(`
     updated_at DATETIME DEFAULT (datetime('now','localtime'))
   );
 
+  CREATE TABLE IF NOT EXISTS agenda_likes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    agenda_id INTEGER NOT NULL,
+    voter_key TEXT NOT NULL,
+    created_at DATETIME DEFAULT (datetime('now','localtime')),
+    UNIQUE(agenda_id, voter_key)
+  );
+
   CREATE TABLE IF NOT EXISTS newsletters (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
@@ -56,6 +64,7 @@ db.exec(`
 
   CREATE INDEX IF NOT EXISTS idx_agendas_status ON agendas(status);
   CREATE INDEX IF NOT EXISTS idx_agendas_created_at ON agendas(created_at);
+  CREATE INDEX IF NOT EXISTS idx_agenda_likes_agenda_id ON agenda_likes(agenda_id);
   CREATE INDEX IF NOT EXISTS idx_newsletters_status ON newsletters(status);
   CREATE INDEX IF NOT EXISTS idx_newsletters_created_at ON newsletters(created_at);
 `)

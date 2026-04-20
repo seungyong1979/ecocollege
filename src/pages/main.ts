@@ -91,6 +91,8 @@ export async function mainPage(c: Context) {
     #carousel-track { display:flex; gap:16px; transition:transform 0.7s ease-in-out; }
     .agenda-card { min-width:280px; max-width:320px; flex-shrink:0; }
     @media(max-width:640px){ .agenda-card{min-width:calc(100vw - 64px);max-width:calc(100vw - 64px);} }
+    .like-btn { transition: all 0.18s cubic-bezier(0.34,1.56,0.64,1); }
+    .like-btn:active { transform: scale(0.9) !important; }
 
     /* ── 사이드 메뉴 ── */
     #side-menu {
@@ -641,6 +643,8 @@ export async function mainPage(c: Context) {
 let allAgendas = []
 let carouselInterval = null
 let carouselOffset = 0
+// 좋아요 상태 (로컬스토리지 기반)
+let likedSet = new Set(JSON.parse(localStorage.getItem('eco_liked') || '[]'))
 
 // ==================== 사이드 메뉴 ====================
 function toggleMenu() {
@@ -719,16 +723,23 @@ function renderCarousel() {
   track.innerHTML = allAgendas.map((a,i) => {
     const p = palette[i % palette.length]
     const date = new Date(a.created_at).toLocaleDateString('ko-KR',{month:'short',day:'numeric'})
-    return \`<div class="agenda-card \${p.bg} border \${p.border} rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow">
+    const liked = likedSet.has(a.id)
+    const likeCount = a.likes || 0
+    return \`<div class="agenda-card \${p.bg} border \${p.border} rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow" id="card-\${a.id}">
       <div class="flex items-start gap-3">
         <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center flex-shrink-0 shadow-sm">
           <i class="fas fa-quote-left text-xs \${p.icon}"></i>
         </div>
         <p class="text-gray-700 text-sm leading-relaxed flex-1">\${esc(a.content)}</p>
       </div>
-      <div class="mt-3 flex items-center justify-between text-xs text-gray-400">
-        <span><i class="fas fa-map-marker-alt mr-1 \${p.icon}"></i>\${esc(a.district)}</span>
-        <span>\${date}</span>
+      <div class="mt-4 flex items-center justify-between">
+        <span class="text-xs text-gray-400"><i class="fas fa-map-marker-alt mr-1 \${p.icon}"></i>\${esc(a.district)} · \${date}</span>
+        <button onclick="toggleLike(\${a.id}, this)"
+          class="like-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all \${liked ? 'bg-rose-500 text-white shadow-sm' : 'bg-white text-gray-400 border border-gray-200 hover:border-rose-300 hover:text-rose-400'}"
+          data-liked="\${liked ? '1' : '0'}" data-id="\${a.id}">
+          <i class="fas fa-heart text-xs"></i>
+          <span class="like-count">\${likeCount}</span>
+        </button>
       </div>
     </div>\`
   }).join('')
@@ -832,6 +843,52 @@ async function submitAgenda() {
   } finally {
     btn.disabled = false
     btn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>의제 최종 등록하기'
+  }
+}
+
+async function toggleLike(agendaId, btn) {
+  // 낙관적 업데이트 (즉각 반응)
+  const wasLiked = btn.dataset.liked === '1'
+  const countEl = btn.querySelector('.like-count')
+  const current = parseInt(countEl.textContent) || 0
+
+  if (wasLiked) {
+    btn.dataset.liked = '0'
+    btn.className = 'like-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all bg-white text-gray-400 border border-gray-200 hover:border-rose-300 hover:text-rose-400'
+    countEl.textContent = Math.max(0, current - 1)
+    likedSet.delete(agendaId)
+  } else {
+    btn.dataset.liked = '1'
+    btn.className = 'like-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all bg-rose-500 text-white shadow-sm'
+    countEl.textContent = current + 1
+    likedSet.add(agendaId)
+    // 하트 애니메이션
+    btn.style.transform = 'scale(1.25)'
+    setTimeout(() => btn.style.transform = '', 200)
+  }
+  localStorage.setItem('eco_liked', JSON.stringify([...likedSet]))
+
+  try {
+    const res = await fetch(\`/api/agendas/\${agendaId}/like\`, { method: 'POST' })
+    const json = await res.json()
+    if (json.success) {
+      // 서버 실제 값으로 동기화
+      countEl.textContent = json.likes
+      if (json.liked) {
+        btn.dataset.liked = '1'
+        btn.className = 'like-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all bg-rose-500 text-white shadow-sm'
+        likedSet.add(agendaId)
+      } else {
+        btn.dataset.liked = '0'
+        btn.className = 'like-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all bg-white text-gray-400 border border-gray-200 hover:border-rose-300 hover:text-rose-400'
+        likedSet.delete(agendaId)
+      }
+      localStorage.setItem('eco_liked', JSON.stringify([...likedSet]))
+    }
+  } catch(e) {
+    // 실패 시 원상복구
+    btn.dataset.liked = wasLiked ? '1' : '0'
+    countEl.textContent = current
   }
 }
 
