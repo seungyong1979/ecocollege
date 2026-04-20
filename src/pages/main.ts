@@ -75,8 +75,20 @@ export async function mainPage(c: Context) {
   </script>
   <style>
     * { font-family: 'Noto Sans KR', sans-serif; }
-    .word-cloud-item { display:inline-block; transition:transform 0.2s; cursor:default; }
-    .word-cloud-item:hover { transform:scale(1.15); }
+    .word-cloud-item { display:inline-block; transition:transform 0.2s, opacity 0.2s; cursor:default; white-space:nowrap; }
+    .word-cloud-item:hover { transform:scale(1.18) !important; opacity:1 !important; z-index:10; position:relative; }
+    /* 말풍선 카드 */
+    .bubble-card { position:relative; border-radius:18px; transition:transform 0.2s, box-shadow 0.2s; }
+    .bubble-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.1); }
+    .bubble-card::after { content:''; position:absolute; bottom:-10px; left:24px; width:0; height:0; border-left:10px solid transparent; border-right:10px solid transparent; }
+    .bubble-green::after { border-top:10px solid #f0fdf4; }
+    .bubble-blue::after { border-top:10px solid #eff6ff; }
+    .bubble-purple::after { border-top:10px solid #faf5ff; }
+    .bubble-amber::after { border-top:10px solid #fffbeb; }
+    .bubble-rose::after { border-top:10px solid #fff1f2; }
+    /* 전체 의제 패널 */
+    #all-agendas-panel { max-height:0; overflow:hidden; transition:max-height 0.5s cubic-bezier(0.4,0,0.2,1); }
+    #all-agendas-panel.open { max-height:9999px; }
     @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
     .fade-in-up { animation:fadeInUp 0.6s ease-out forwards; }
     @keyframes pulse-green { 0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.4)} 50%{box-shadow:0 0 0 10px rgba(34,197,94,0)} }
@@ -356,7 +368,8 @@ export async function mainPage(c: Context) {
 
 <!-- HERO -->
 <section class="relative min-h-screen flex items-center justify-center overflow-hidden"
-  ${s.hero_image ? `style="background-image:url('${s.hero_image}');background-size:cover;background-position:center;"` : 'style="background:linear-gradient(135deg,#14532d 0%,#166534 40%,#15803d 100%);"'}>
+  ${s.hero_image ? '' : 'style="background:linear-gradient(135deg,#14532d 0%,#166534 40%,#15803d 100%);"'}>
+  ${s.hero_image ? `<img src="${s.hero_image}" alt="" class="absolute inset-0 w-full h-full" style="object-fit:cover;object-position:center;">` : ''}
   <div class="hero-overlay absolute inset-0"></div>
   <div class="absolute inset-0 overflow-hidden pointer-events-none">
     <div class="absolute top-10 left-10 w-64 h-64 bg-green-400 opacity-10 rounded-full blur-3xl"></div>
@@ -406,9 +419,28 @@ export async function mainPage(c: Context) {
         </div>
       </div>
     </div>
-    <div class="text-center mt-6">
-      <span class="text-sm text-gray-400">총 <span id="total-count" class="font-bold text-green-600">0</span>개의 의제가 등록되었습니다</span>
+    <!-- 총 개수 + 전체보기 버튼 -->
+    <div class="text-center mt-8">
+      <p class="text-sm text-gray-400 mb-4">총 <span id="total-count" class="font-bold text-green-600">0</span>개의 의제가 등록되었습니다</p>
+      <button id="view-all-btn" onclick="toggleAllAgendas()"
+        class="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded-2xl transition-all shadow-sm hover:shadow-md">
+        <i class="fas fa-comments"></i>
+        <span id="view-all-btn-text">모여진 전체 의제 보기</span>
+        <i id="view-all-chevron" class="fas fa-chevron-down text-xs transition-transform duration-300"></i>
+      </button>
     </div>
+
+    <!-- 전체 의제 말풍선 패널 -->
+    <div id="all-agendas-panel">
+      <div class="mt-8 pb-4">
+        <div id="all-agendas-list" class="space-y-4">
+          <div class="text-center py-10 text-gray-400">
+            <i class="fas fa-spinner fa-spin text-2xl text-green-400"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
 
@@ -418,11 +450,15 @@ export async function mainPage(c: Context) {
     <div class="text-center mb-10">
       <span class="text-green-600 text-sm font-semibold uppercase tracking-wider">WORD CLOUD</span>
       <h2 class="text-3xl font-black text-gray-800 mt-2">많이 언급된 키워드</h2>
-      <p class="text-gray-500 mt-2">시민들의 의제에서 가장 많이 등장한 단어들입니다</p>
+      <p class="text-gray-500 mt-2">시민들의 의제에서 가장 많이 등장한 명사들입니다</p>
       <div class="section-divider w-24 mx-auto mt-4"></div>
     </div>
-    <div id="word-cloud-container" class="bg-white rounded-2xl shadow-lg p-8 min-h-48 flex flex-wrap justify-center items-center gap-3">
-      <div class="text-gray-400 text-sm"><i class="fas fa-spinner fa-spin mr-2 text-green-400"></i>키워드를 분석 중...</div>
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden" style="min-height:280px;">
+      <div id="word-cloud-container" style="width:100%;min-height:280px;position:relative;">
+        <div class="absolute inset-0 flex items-center justify-center text-gray-400 text-sm">
+          <i class="fas fa-spinner fa-spin mr-2 text-green-400"></i>키워드를 분석 중...
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -758,25 +794,198 @@ async function loadWordCloud() {
   try {
     const res = await fetch('/api/word-cloud')
     const json = await res.json()
-    const el = document.getElementById('word-cloud-container')
+    const container = document.getElementById('word-cloud-container')
     if (!json.success || !json.data.length) {
-      el.innerHTML = '<p class="text-gray-400 text-sm">아직 키워드 데이터가 없습니다.</p>'
+      container.innerHTML = '<div class="flex items-center justify-center h-48 text-gray-400 text-sm">아직 키워드 데이터가 없습니다.</div>'
       return
     }
     const words = json.data
-    const maxC = words[0].count, minC = words[words.length-1].count
-    const colors = ['#16a34a','#15803d','#059669','#0d9488','#2563eb','#7c3aed','#db2777','#ea580c','#ca8a04']
-    el.innerHTML = words.map((item,i) => {
-      const ratio = maxC===minC ? 0.5 : (item.count-minC)/(maxC-minC)
-      const fs = Math.round(12 + ratio*28)
-      const op = (0.6 + ratio*0.4).toFixed(2)
-      const rot = [-15,-8,0,8,15][i%5]
-      return \`<span class="word-cloud-item font-bold select-none"
-        style="font-size:\${fs}px;color:\${colors[i%colors.length]};opacity:\${op};transform:rotate(\${rot}deg)"
-        title="\${item.count}회 언급">\${esc(item.word)}</span>\`
-    }).join(' ')
+    const maxC = words[0].count
+    const minC = words[words.length - 1].count
+    const colors = [
+      '#15803d','#16a34a','#059669',
+      '#0d9488','#0284c7','#4f46e5',
+      '#7c3aed','#db2777','#ea580c','#ca8a04'
+    ]
+    // 중앙집중형 워드클라우드: 상위 단어를 중앙 큰 크기로, 하위는 주변 작게
+    // 컨테이너 실제 너비 기반
+    const cw = container.offsetWidth || 600
+    const ch = Math.max(320, Math.round(cw * 0.55))
+    container.style.height = ch + 'px'
+    container.innerHTML = ''
+
+    // 각 단어 크기 계산 (중앙 배치용)
+    const items = words.map((item, i) => {
+      const ratio = maxC === minC ? 0.5 : (item.count - minC) / (maxC - minC)
+      const fs = Math.round(13 + ratio * 38) // 13px ~ 51px
+      const fw = ratio > 0.6 ? 900 : ratio > 0.3 ? 700 : 500
+      const op = parseFloat((0.55 + ratio * 0.45).toFixed(2))
+      const color = colors[i % colors.length]
+      const rot = ratio > 0.7 ? 0 : [-12, -6, 0, 6, 12][i % 5]
+      return { word: item.word, count: item.count, fs, fw, op, color, rot, ratio }
+    })
+
+    // 배치: 중앙에서 바깥으로 나선형
+    const placed = []
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+
+    function measureText(item) {
+      ctx.font = item.fw + ' ' + item.fs + 'px "Noto Sans KR",sans-serif'
+      const w = ctx.measureText(item.word).width
+      return { w: w + 10, h: item.fs + 8 }
+    }
+
+    function overlaps(r1, r2) {
+      return !(r1.x + r1.w < r2.x - 4 || r1.x > r2.x + r2.w + 4 ||
+               r1.y + r1.h < r2.y - 4 || r1.y > r2.y + r2.h + 4)
+    }
+
+    const cx = cw / 2, cy = ch / 2
+    for (const item of items) {
+      const dim = measureText(item)
+      let placed_flag = false
+      // 나선형으로 위치 탐색
+      for (let r = 0; r < Math.max(cx, cy); r += 4) {
+        const steps = Math.max(1, Math.round(2 * Math.PI * r / 10))
+        for (let s = 0; s < steps; s++) {
+          const angle = (2 * Math.PI * s / steps) + (r * 0.15)
+          const x = cx + r * Math.cos(angle) - dim.w / 2
+          const y = cy + r * Math.sin(angle) - dim.h / 2
+          if (x < 2 || x + dim.w > cw - 2 || y < 2 || y + dim.h > ch - 2) continue
+          const rect = { x, y, w: dim.w, h: dim.h }
+          if (!placed.some(p => overlaps(p, rect))) {
+            placed.push(rect)
+            item._x = x; item._y = y
+            placed_flag = true
+            break
+          }
+        }
+        if (placed_flag) break
+      }
+      if (!placed_flag) {
+        // fallback: 배치 못하면 랜덤 위치
+        item._x = Math.random() * (cw - dim.w)
+        item._y = Math.random() * (ch - dim.h)
+      }
+    }
+
+    // DOM 생성
+    items.forEach(item => {
+      const span = document.createElement('span')
+      span.className = 'word-cloud-item font-bold select-none'
+      span.title = item.word + ' (' + item.count + '회 언급)'
+      span.textContent = item.word
+      span.style.cssText = [
+        'position:absolute',
+        'left:' + Math.round(item._x || 0) + 'px',
+        'top:' + Math.round(item._y || 0) + 'px',
+        'font-size:' + item.fs + 'px',
+        'font-weight:' + item.fw,
+        'color:' + item.color,
+        'opacity:' + item.op,
+        'transform:rotate(' + item.rot + 'deg)',
+        'line-height:1',
+        'padding:4px 2px'
+      ].join(';')
+      container.appendChild(span)
+    })
   } catch(e) {
-    document.getElementById('word-cloud-container').innerHTML = '<p class="text-gray-400 text-sm">키워드를 불러올 수 없습니다.</p>'
+    document.getElementById('word-cloud-container').innerHTML =
+      '<div class="flex items-center justify-center h-48 text-gray-400 text-sm">키워드를 불러올 수 없습니다.</div>'
+  }
+}
+
+// ==================== 전체 의제 보기 ====================
+let allAgendasLoaded = false
+let allAgendasOpen = false
+
+async function toggleAllAgendas() {
+  const panel = document.getElementById('all-agendas-panel')
+  const btnText = document.getElementById('view-all-btn-text')
+  const chevron = document.getElementById('view-all-chevron')
+
+  if (allAgendasOpen) {
+    // 닫기
+    panel.classList.remove('open')
+    btnText.textContent = '모여진 전체 의제 보기'
+    chevron.style.transform = 'rotate(0deg)'
+    allAgendasOpen = false
+    return
+  }
+
+  // 열기
+  panel.classList.add('open')
+  btnText.textContent = '의제 목록 접기'
+  chevron.style.transform = 'rotate(180deg)'
+  allAgendasOpen = true
+
+  if (allAgendasLoaded) return
+
+  // 데이터 로드
+  const listEl = document.getElementById('all-agendas-list')
+  listEl.innerHTML = '<div class="text-center py-10 text-gray-400"><i class="fas fa-spinner fa-spin text-2xl text-green-400"></i><p class="mt-2 text-sm">의제를 불러오는 중...</p></div>'
+
+  try {
+    const res = await fetch('/api/agendas/all')
+    const json = await res.json()
+    if (!json.success || !json.data.length) {
+      listEl.innerHTML = '<div class="text-center py-12 text-gray-400"><i class="fas fa-seedling text-4xl text-green-200 mb-3 block"></i><p>아직 등록된 의제가 없습니다.</p></div>'
+      allAgendasLoaded = true
+      return
+    }
+    const bubblePalettes = [
+      { bg: '#f0fdf4', border: '#bbf7d0', tail: '#f0fdf4', icon: '#16a34a' },
+      { bg: '#eff6ff', border: '#bfdbfe', tail: '#eff6ff', icon: '#2563eb' },
+      { bg: '#faf5ff', border: '#e9d5ff', tail: '#faf5ff', icon: '#7c3aed' },
+      { bg: '#fffbeb', border: '#fde68a', tail: '#fffbeb', icon: '#d97706' },
+      { bg: '#fff1f2', border: '#fecdd3', tail: '#fff1f2', icon: '#e11d48' },
+    ]
+    listEl.innerHTML = json.data.map((a, i) => {
+      const p = bubblePalettes[i % bubblePalettes.length]
+      const date = new Date(a.created_at).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })
+      const liked = likedSet.has(a.id)
+      const likeCount = a.likes || 0
+      return \`<div class="bubble-card px-5 pt-4 pb-6"
+        style="background:\${p.bg};border:1.5px solid \${p.border};position:relative;" id="bubble-\${a.id}">
+        <!-- 말풍선 꼬리 -->
+        <div style="position:absolute;bottom:-12px;left:28px;width:0;height:0;
+          border-left:11px solid transparent;border-right:11px solid transparent;
+          border-top:12px solid \${p.border};"></div>
+        <div style="position:absolute;bottom:-10px;left:29px;width:0;height:0;
+          border-left:10px solid transparent;border-right:10px solid transparent;
+          border-top:10px solid \${p.bg};"></div>
+        <!-- 의제 내용 -->
+        <div class="flex items-start gap-3">
+          <div class="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+            style="background:white;border:1.5px solid \${p.border};">
+            <i class="fas fa-quote-left text-xs" style="color:\${p.icon}"></i>
+          </div>
+          <p class="text-gray-800 text-sm leading-relaxed flex-1 font-medium">\${esc(a.content)}</p>
+        </div>
+        <!-- 하단 정보 -->
+        <div class="mt-3 flex items-center justify-between pl-10">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full"
+              style="background:white;color:\${p.icon};border:1px solid \${p.border};">
+              <i class="fas fa-map-marker-alt mr-1"></i>\${esc(a.district)}
+            </span>
+            <span class="text-xs text-gray-400">\${date}</span>
+          </div>
+          <button onclick="toggleLike(\${a.id}, this)"
+            class="like-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all \${liked ? 'bg-rose-500 text-white shadow-sm' : 'bg-white text-gray-400 border border-gray-200 hover:border-rose-300 hover:text-rose-400'}"
+            data-liked="\${liked ? '1' : '0'}" data-id="\${a.id}">
+            <i class="fas fa-heart text-xs"></i>
+            <span class="like-count">\${likeCount}</span>
+          </button>
+        </div>
+      </div>
+      <!-- 말풍선 간격 -->
+      <div class="h-4"></div>\`
+    }).join('')
+    allAgendasLoaded = true
+  } catch(e) {
+    listEl.innerHTML = '<div class="text-center py-8 text-red-400 text-sm">불러오기 실패. 새로고침 해주세요.</div>'
   }
 }
 
