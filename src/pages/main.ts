@@ -93,7 +93,7 @@ export async function mainPage(c: Context) {
     .fade-in-up { animation:fadeInUp 0.6s ease-out forwards; }
     @keyframes pulse-green { 0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.4)} 50%{box-shadow:0 0 0 10px rgba(34,197,94,0)} }
     .pulse-green { animation:pulse-green 2s infinite; }
-    .hero-overlay { background:linear-gradient(135deg,rgba(21,128,61,0.88) 0%,rgba(5,46,22,0.75) 100%); }
+    .hero-overlay { background:linear-gradient(135deg,rgba(21,128,61,0.88) 0%,rgba(5,46,22,0.75) 100%); position:absolute; inset:0; z-index:0; }
     .glass-card { background:rgba(255,255,255,0.92); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.6); }
     textarea:focus,input:focus,select:focus { outline:none; border-color:#16a34a !important; box-shadow:0 0 0 3px rgba(22,163,74,0.15); }
     .btn-primary { background:linear-gradient(135deg,#16a34a,#15803d); transition:all 0.2s; }
@@ -367,15 +367,20 @@ export async function mainPage(c: Context) {
 </nav>
 
 <!-- HERO -->
-<section class="relative min-h-screen flex items-center justify-center overflow-hidden"
-  ${s.hero_image ? '' : 'style="background:linear-gradient(135deg,#14532d 0%,#166534 40%,#15803d 100%);"'}>
-  ${s.hero_image ? `<img src="${s.hero_image}" alt="" class="absolute inset-0 w-full h-full" style="object-fit:cover;object-position:center;">` : ''}
-  <div class="hero-overlay absolute inset-0"></div>
-  <div class="absolute inset-0 overflow-hidden pointer-events-none">
-    <div class="absolute top-10 left-10 w-64 h-64 bg-green-400 opacity-10 rounded-full blur-3xl"></div>
-    <div class="absolute bottom-20 right-10 w-96 h-96 bg-green-300 opacity-10 rounded-full blur-3xl"></div>
+<section id="hero-section" class="relative min-h-screen flex items-center justify-center overflow-hidden"
+  style="${s.hero_image ? '' : 'background:linear-gradient(135deg,#14532d 0%,#166534 40%,#15803d 100%);'}">
+  ${s.hero_image ? `
+  <!-- 크로스 브라우저 히어로 이미지: img 태그 + CSS 병행 -->
+  <img id="hero-bg-img" src="${s.hero_image}" alt=""
+    style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:0;display:block;"
+    onerror="this.style.display='none'">
+  ` : ''}
+  <div class="hero-overlay" style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:1;"></div>
+  <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:2;">
+    <div style="position:absolute;top:40px;left:40px;width:256px;height:256px;background:#4ade80;opacity:0.08;border-radius:9999px;filter:blur(64px);"></div>
+    <div style="position:absolute;bottom:80px;right:40px;width:384px;height:384px;background:#86efac;opacity:0.08;border-radius:9999px;filter:blur(64px);"></div>
   </div>
-  <div class="relative z-10 text-center px-4 max-w-4xl mx-auto w-full">
+  <div style="position:relative;z-index:3;" class="text-center px-4 max-w-4xl mx-auto w-full">
     <div class="inline-flex items-center gap-2 bg-white bg-opacity-20 rounded-full px-4 py-2 mb-6 text-white text-sm font-medium">
       <i class="fas fa-leaf text-green-300"></i><span>순천에코칼리지</span>
     </div>
