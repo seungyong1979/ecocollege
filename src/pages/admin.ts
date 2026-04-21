@@ -150,6 +150,11 @@ export async function adminPage(c: Context) {
             <button onclick="showSection('settings')" class="flex items-center gap-2 bg-purple-50 hover:bg-purple-100 text-purple-800 font-semibold py-3 px-4 rounded-xl transition-all">
               <i class="fas fa-cog"></i>사이트 설정
             </button>
+            <a href="/manual.pdf" download id="manual-dl-btn"
+              class="flex items-center gap-2 bg-red-50 hover:bg-red-100 text-red-800 font-semibold py-3 px-4 rounded-xl transition-all"
+              onclick="this.innerHTML='<i class=\\'fas fa-spinner fa-spin\\'></i> 생성 중...';setTimeout(()=>{this.innerHTML='<i class=\\'fas fa-file-pdf\\'></i>사용 매뉴얼 PDF'},4000)">
+              <i class="fas fa-file-pdf"></i>사용 매뉴얼 PDF
+            </a>
           </div>
         </div>
       </section>

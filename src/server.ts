@@ -8,6 +8,7 @@ import { infoPage, INFO_PAGES } from './pages/infoPage'
 import { newsletterListPage, newsletterDetailPage } from './pages/newsletterPage'
 import { apiRoutes } from './routes/api'
 import { adminRoutes } from './routes/adminApi'
+import { generateManualPdf } from './utils/manualPdf'
 
 // DB 초기화 (임포트 시 자동 실행)
 import './db'
@@ -37,6 +38,26 @@ app.get('/newsletter/:id', newsletterDetailPage)
 // API
 app.route('/api', apiRoutes)
 app.route('/api/admin', adminRoutes)
+
+// 사용 매뉴얼 PDF 다운로드
+app.get('/manual.pdf', async (c) => {
+  try {
+    const pdfBuffer = await generateManualPdf()
+    const today = new Date()
+    const dateStr = `${today.getFullYear()}${String(today.getMonth()+1).padStart(2,'0')}${String(today.getDate()).padStart(2,'0')}`
+    return new Response(pdfBuffer, {
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="ecocollege_manual_${dateStr}.pdf"`,
+        'Content-Length': String(pdfBuffer.length),
+        'Cache-Control': 'no-cache',
+      }
+    })
+  } catch (e) {
+    console.error('PDF 생성 오류:', e)
+    return c.json({ error: 'PDF 생성 중 오류가 발생했습니다.' }, 500)
+  }
+})
 
 // 헬스체크
 app.get('/health', (c) => c.json({ status: 'ok', time: new Date().toISOString() }))
