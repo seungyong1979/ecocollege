@@ -243,7 +243,7 @@ export async function mainPage(c: Context) {
         </div>
         <div>
           <p class="text-white font-black text-xs tracking-widest">ABOUT</p>
-          <p class="text-green-500 text-xs">단체 소개</p>
+          <p class="text-green-500 text-xs">소개</p>
         </div>
       </div>
       ${s.mv_about_eco ? `<a href="/info/about-eco" class="sub-menu-link">
