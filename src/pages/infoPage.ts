@@ -104,10 +104,31 @@ export const INFO_PAGES: Record<string, {
   },
 }
 
-// 텍스트 → HTML 단락 변환
+// 텍스트 내 URL을 <a> 태그로 변환 (새창 열기)
+function linkify(line: string): string {
+  // http:// 또는 https:// 로 시작하는 URL 감지
+  return line.replace(
+    /(https?:\/\/[^\s<>"'）)]+)/g,
+    (url) => {
+      // 마지막 문장부호 제거 (., ), ] 등)
+      const trailingPunct = url.match(/[.,;!?)\]]+$/)
+      const cleanUrl = trailingPunct ? url.slice(0, -trailingPunct[0].length) : url
+      const suffix = trailingPunct ? trailingPunct[0] : ''
+      // 표시 텍스트: 너무 길면 도메인만 표시
+      const display = cleanUrl.length > 50
+        ? cleanUrl.replace(/^https?:\/\//, '').replace(/\/.*$/, '')
+        : cleanUrl.replace(/^https?:\/\//, '')
+      return `<a href="${cleanUrl}" target="_blank" rel="noopener noreferrer"
+        class="text-green-600 underline underline-offset-2 hover:text-green-800 break-all transition-colors"
+        >${display}</a>${suffix}`
+    }
+  )
+}
+
+// 텍스트 → HTML 단락 변환 (URL 자동 링크 포함)
 function toHtmlParagraphs(text: string): string {
   if (!text) return ''
-  return text.split('\n').filter(l => l.trim()).map(l => `<p>${l.trim()}</p>`).join('')
+  return text.split('\n').filter(l => l.trim()).map(l => `<p>${linkify(l.trim())}</p>`).join('')
 }
 
 export async function infoPage(c: Context, slug: string) {
