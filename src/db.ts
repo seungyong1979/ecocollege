@@ -63,6 +63,12 @@ db.exec(`
     updated_at DATETIME DEFAULT (datetime('now','localtime'))
   );
 
+  CREATE TABLE IF NOT EXISTS banned_words (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    word TEXT UNIQUE NOT NULL,
+    created_at DATETIME DEFAULT (datetime('now','localtime'))
+  );
+
   CREATE INDEX IF NOT EXISTS idx_agendas_status ON agendas(status);
   CREATE INDEX IF NOT EXISTS idx_agendas_created_at ON agendas(created_at);
   CREATE INDEX IF NOT EXISTS idx_agenda_likes_agenda_id ON agenda_likes(agenda_id);
@@ -118,6 +124,11 @@ const settings: [string, string][] = [
   ['menu_visible_newsletter', '1'],
 ]
 for (const [k, v] of settings) insertSetting.run(k, v)
+
+// 기본 금칙어
+const insertBannedWord = db.prepare(`INSERT OR IGNORE INTO banned_words (word) VALUES (?)`)
+const defaultBannedWords = ['시발', '씨발', '개새', '병신', '지랄', '니미', '꺼져', '쓰레기']
+for (const w of defaultBannedWords) insertBannedWord.run(w)
 
 // 기본 관리자 계정 (비밀번호: admin1234)
 // SHA-256: ac9689e2272427085e35b9d3e3e8bed88cb3434828b43b86fc0596cad4c6e270

@@ -93,6 +93,10 @@ export async function adminPage(c: Context) {
         class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer text-green-100 hover:text-white">
         <i class="fas fa-newspaper w-4"></i><span>소식지 관리</span>
       </a>
+      <a onclick="showSection('banned')" id="nav-banned"
+        class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer text-green-100 hover:text-white">
+        <i class="fas fa-ban w-4"></i><span>금칙어 관리</span>
+      </a>
       <a onclick="showSection('account')" id="nav-account"
         class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer text-green-100 hover:text-white">
         <i class="fas fa-user-cog w-4"></i><span>계정 설정</span>
@@ -515,6 +519,43 @@ export async function adminPage(c: Context) {
         </div>
       </section>
 
+      <!-- 금칙어 관리 -->
+      <section id="sec-banned" class="hidden">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-black text-gray-800">금칙어 관리</h2>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm border p-6 mb-4">
+          <p class="text-sm text-gray-500 mb-4">
+            <i class="fas fa-info-circle text-blue-400 mr-1"></i>
+            등록된 금칙어는 의제 등록 시 자동으로 <strong>*</strong>로 치환됩니다. 단어를 추가·삭제하여 실시간으로 관리하세요.
+          </p>
+          <div class="flex gap-2 mb-5">
+            <input type="text" id="bw-input" placeholder="추가할 금칙어 입력..."
+              maxlength="50"
+              class="flex-1 border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm transition-all"
+              onkeydown="if(event.key==='Enter')addBannedWord()">
+            <button onclick="addBannedWord()"
+              class="bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-all whitespace-nowrap">
+              <i class="fas fa-plus mr-1"></i>추가
+            </button>
+          </div>
+          <div id="bw-msg" class="hidden text-sm p-3 rounded-xl mb-3"></div>
+          <div id="bw-list" class="min-h-[60px]">
+            <div class="text-center py-6 text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>불러오는 중...</div>
+          </div>
+          <p class="text-xs text-gray-400 mt-3">총 <span id="bw-count" class="font-bold text-gray-600">0</span>개의 금칙어가 등록되어 있습니다.</p>
+        </div>
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
+          <p class="font-bold mb-1"><i class="fas fa-exclamation-triangle mr-1"></i>사용 안내</p>
+          <ul class="list-disc list-inside space-y-1 text-xs text-amber-700">
+            <li>금칙어는 대소문자를 구분하지 않습니다.</li>
+            <li>의제 내용에 포함된 금칙어는 등록 시 자동으로 <strong>*</strong>로 치환됩니다.</li>
+            <li>기존에 등록된 의제에는 소급 적용되지 않습니다.</li>
+            <li>너무 짧은 단어(1자)는 오탐이 생길 수 있으니 주의하세요.</li>
+          </ul>
+        </div>
+      </section>
+
       <!-- 계정 설정 -->
       <section id="sec-account" class="hidden">
         <h2 class="text-2xl font-black text-gray-800 mb-6">계정 설정</h2>
@@ -627,7 +668,7 @@ function showAdminMain() {
 }
 
 function showSection(name) {
-  ['dashboard','agendas','settings','newsletter','account'].forEach(s => {
+  ['dashboard','agendas','settings','newsletter','banned','account'].forEach(s => {
     document.getElementById('sec-'+s).classList.toggle('hidden',s!==name)
     document.getElementById('nav-'+s).classList.toggle('active',s===name)
   })
@@ -635,6 +676,7 @@ function showSection(name) {
   if (name==='settings') loadSettings()
   if (name==='dashboard') loadStats()
   if (name==='newsletter') loadNewsletters()
+  if (name==='banned') loadBannedWords()
 }
 
 async function loadStats() {
@@ -1021,6 +1063,131 @@ document.addEventListener('DOMContentLoaded', () => {
     })
   }
 })
+
+// ── 금칙어 관리 ─────────────────────────────────────────────────
+let bannedWords = []
+
+async function loadBannedWords() {
+  const listEl = document.getElementById('bw-list')
+  const countEl = document.getElementById('bw-count')
+  listEl.innerHTML = '<div class="text-center py-6 text-gray-400"><i class="fas fa-spinner fa-spin mr-2"></i>불러오는 중...</div>'
+  try {
+    const res = await aFetch('/api/admin/banned-words')
+    const json = await res.json()
+    if (!json.success) { listEl.innerHTML = '<p class="text-center text-red-400 py-4">불러오기 실패</p>'; return }
+    bannedWords = json.data
+    countEl.textContent = bannedWords.length
+    renderBannedWords()
+  } catch(e) {
+    listEl.innerHTML = '<p class="text-center text-red-400 py-4">오류가 발생했습니다.</p>'
+  }
+}
+
+function renderBannedWords() {
+  const listEl = document.getElementById('bw-list')
+  if (bannedWords.length === 0) {
+    listEl.innerHTML = '<p class="text-center text-gray-400 py-6"><i class="fas fa-check-circle text-green-400 mr-2"></i>등록된 금칙어가 없습니다.</p>'
+    return
+  }
+  listEl.innerHTML = '<div class="flex flex-wrap gap-2">' +
+    bannedWords.map(w => \`
+      <div class="group flex items-center gap-1.5 bg-red-50 border border-red-200 text-red-700 rounded-full px-3 py-1.5 text-sm font-medium">
+        <span id="bw-text-\${w.id}" class="cursor-default" ondblclick="startEditBannedWord(\${w.id})">\${esc(w.word)}</span>
+        <input type="text" id="bw-edit-\${w.id}" class="hidden border border-red-300 rounded px-1 text-xs w-20"
+          value="\${esc(w.word)}"
+          onblur="cancelEditBannedWord(\${w.id})"
+          onkeydown="if(event.key==='Enter')saveEditBannedWord(\${w.id});if(event.key==='Escape')cancelEditBannedWord(\${w.id})">
+        <button onclick="deleteBannedWord(\${w.id}, '\${esc(w.word)}')"
+          title="삭제"
+          class="text-red-400 hover:text-red-600 transition-colors ml-0.5">
+          <i class="fas fa-times text-xs"></i>
+        </button>
+      </div>
+    \`).join('') +
+  '</div>'
+}
+
+function showBwMsg(msg, ok=false) {
+  const el = document.getElementById('bw-msg')
+  el.textContent = msg
+  el.className = \`text-sm p-3 rounded-xl mb-3 \${ok ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-600 border border-red-200'}\`
+  el.classList.remove('hidden')
+  setTimeout(() => el.classList.add('hidden'), 3000)
+}
+
+async function addBannedWord() {
+  const input = document.getElementById('bw-input')
+  const word = input.value.trim()
+  if (!word) { showBwMsg('단어를 입력해 주세요.'); return }
+  try {
+    const res = await aFetch('/api/admin/banned-words', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ word })
+    })
+    const json = await res.json()
+    if (json.success) {
+      input.value = ''
+      showBwMsg(\`"\${esc(word)}" 단어가 추가되었습니다.\`, true)
+      await loadBannedWords()
+    } else {
+      showBwMsg(json.error || '추가 실패')
+    }
+  } catch(e) { showBwMsg('오류가 발생했습니다.') }
+}
+
+async function deleteBannedWord(id, word) {
+  if (!confirm(\`"\${word}" 단어를 삭제하시겠습니까?\`)) return
+  try {
+    const res = await aFetch(\`/api/admin/banned-words/\${id}\`, { method: 'DELETE' })
+    const json = await res.json()
+    if (json.success) {
+      showBwMsg(\`"\${esc(word)}" 단어가 삭제되었습니다.\`, true)
+      await loadBannedWords()
+    } else {
+      showBwMsg(json.error || '삭제 실패')
+    }
+  } catch(e) { showBwMsg('오류가 발생했습니다.') }
+}
+
+function startEditBannedWord(id) {
+  const textEl = document.getElementById('bw-text-' + id)
+  const inputEl = document.getElementById('bw-edit-' + id)
+  textEl.classList.add('hidden')
+  inputEl.classList.remove('hidden')
+  inputEl.focus()
+  inputEl.select()
+}
+
+function cancelEditBannedWord(id) {
+  const item = bannedWords.find(w => w.id === id)
+  const textEl = document.getElementById('bw-text-' + id)
+  const inputEl = document.getElementById('bw-edit-' + id)
+  if (item) inputEl.value = item.word
+  textEl.classList.remove('hidden')
+  inputEl.classList.add('hidden')
+}
+
+async function saveEditBannedWord(id) {
+  const inputEl = document.getElementById('bw-edit-' + id)
+  const newWord = inputEl.value.trim()
+  if (!newWord) { cancelEditBannedWord(id); return }
+  try {
+    const res = await aFetch(\`/api/admin/banned-words/\${id}\`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ word: newWord })
+    })
+    const json = await res.json()
+    if (json.success) {
+      showBwMsg('수정되었습니다.', true)
+      await loadBannedWords()
+    } else {
+      showBwMsg(json.error || '수정 실패')
+      cancelEditBannedWord(id)
+    }
+  } catch(e) { showBwMsg('오류가 발생했습니다.'); cancelEditBannedWord(id) }
+}
 </script>
 </body>
 </html>`

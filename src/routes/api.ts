@@ -2,6 +2,23 @@ import { Hono } from 'hono'
 import { db } from '../db'
 import { filterBadWords } from '../utils/auth'
 
+// DB에서 금칙어를 동적으로 불러와 필터링
+function filterBadWordsFromDB(text: string): string {
+  try {
+    const rows = db.prepare(`SELECT word FROM banned_words`).all() as { word: string }[]
+    let result = text
+    for (const { word } of rows) {
+      // 대소문자 구분 없이, 글로벌 치환
+      const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      result = result.replace(new RegExp(escaped, 'gi'), '*'.repeat(word.length))
+    }
+    return result
+  } catch {
+    // DB 오류 시 기본 필터 사용
+    return filterBadWords(text)
+  }
+}
+
 export const apiRoutes = new Hono()
 
 // 의제 목록 (공개) - 좋아요 수 포함 (최신 50개)
@@ -198,7 +215,7 @@ apiRoutes.post('/agendas', async (c) => {
       }
     }
 
-    const filteredContent = filterBadWords(content.trim())
+    const filteredContent = filterBadWordsFromDB(content.trim())
     if (filteredContent.length > 500) return c.json({ success: false, error: '의제는 500자 이내로 작성해 주세요.' }, 400)
 
     db.prepare(

@@ -220,6 +220,65 @@ adminRoutes.delete('/newsletters/:id', authMiddleware, async (c) => {
   }
 })
 
+// ── 금칙어 관리 API ─────────────────────────────────────────────
+// 목록 조회
+adminRoutes.get('/banned-words', authMiddleware, (c) => {
+  try {
+    const rows = db.prepare(`SELECT id, word, created_at FROM banned_words ORDER BY created_at DESC`).all()
+    return c.json({ success: true, data: rows })
+  } catch (e) {
+    return c.json({ success: false, error: 'DB 오류' }, 500)
+  }
+})
+
+// 단어 추가
+adminRoutes.post('/banned-words', authMiddleware, async (c) => {
+  try {
+    const { word } = await c.req.json()
+    if (!word?.trim()) return c.json({ success: false, error: '단어를 입력해 주세요.' }, 400)
+    const trimmed = word.trim()
+    if (trimmed.length < 1 || trimmed.length > 50) {
+      return c.json({ success: false, error: '1~50자 사이의 단어를 입력해 주세요.' }, 400)
+    }
+    // 중복 확인
+    const existing = db.prepare(`SELECT id FROM banned_words WHERE word = ?`).get(trimmed)
+    if (existing) return c.json({ success: false, error: '이미 등록된 단어입니다.' }, 409)
+    const result = db.prepare(`INSERT INTO banned_words (word) VALUES (?)`).run(trimmed) as any
+    return c.json({ success: true, id: result.lastInsertRowid, word: trimmed })
+  } catch (e) {
+    return c.json({ success: false, error: '저장 오류' }, 500)
+  }
+})
+
+// 단어 삭제
+adminRoutes.delete('/banned-words/:id', authMiddleware, async (c) => {
+  try {
+    const id = c.req.param('id')
+    const row = db.prepare(`SELECT id FROM banned_words WHERE id = ?`).get(id)
+    if (!row) return c.json({ success: false, error: '존재하지 않는 단어입니다.' }, 404)
+    db.prepare(`DELETE FROM banned_words WHERE id = ?`).run(id)
+    return c.json({ success: true })
+  } catch (e) {
+    return c.json({ success: false, error: '삭제 오류' }, 500)
+  }
+})
+
+// 단어 수정
+adminRoutes.put('/banned-words/:id', authMiddleware, async (c) => {
+  try {
+    const id = c.req.param('id')
+    const { word } = await c.req.json()
+    if (!word?.trim()) return c.json({ success: false, error: '단어를 입력해 주세요.' }, 400)
+    const trimmed = word.trim()
+    const existing = db.prepare(`SELECT id FROM banned_words WHERE word = ? AND id != ?`).get(trimmed, id)
+    if (existing) return c.json({ success: false, error: '이미 등록된 단어입니다.' }, 409)
+    db.prepare(`UPDATE banned_words SET word = ? WHERE id = ?`).run(trimmed, id)
+    return c.json({ success: true })
+  } catch (e) {
+    return c.json({ success: false, error: '수정 오류' }, 500)
+  }
+})
+
 // 통계
 adminRoutes.get('/stats', authMiddleware, (c) => {
   try {
